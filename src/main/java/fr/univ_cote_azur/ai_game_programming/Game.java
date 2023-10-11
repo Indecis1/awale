@@ -48,6 +48,7 @@ public class Game {
             int holeNumberIndex = getHoleNumber(playerPlays);
 
             sowing(isP1_turn, holeNumberIndex, seedColor);
+            // TODO : capturing function
         }
     }
 
@@ -116,23 +117,23 @@ public class Game {
         }
     }
 
-    private void sowingTransparentBlueSeeds(int polarityOfCases, int holeNumberIndex) {
+    private void sowingTransparentBlueSeeds(int polarityOfholes, int holeNumberIndex) {
         int numberOfBlueSeed = blueSeeds[holeNumberIndex];
         blueSeeds[holeNumberIndex] = 0;
         for (int i = holeNumberIndex + 1; numberOfBlueSeed > 0; i++) {
             int index = i % NUMBER_OF_HOLES;
-            if (index % 2 != polarityOfCases) continue;
+            if (index % 2 != polarityOfholes) continue;
             blueSeeds[index]++;
             numberOfBlueSeed--;
         }
     }
 
-    private void sowingBlueSeeds(int polarityOfCases, int holeNumberIndex) {
+    private void sowingBlueSeeds(int polarityOfholes, int holeNumberIndex) {
         int numberOfBlueSeed = blueSeeds[holeNumberIndex];
         blueSeeds[holeNumberIndex] = 0;
         for (int i = holeNumberIndex + 1; numberOfBlueSeed > 0; i++) {
             int index = i % NUMBER_OF_HOLES;
-            if (index % 2 != polarityOfCases) continue;
+            if (index % 2 != polarityOfholes) continue;
             blueSeeds[index]++;
             numberOfBlueSeed--;
         }
