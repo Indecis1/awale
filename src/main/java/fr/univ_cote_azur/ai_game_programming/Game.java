@@ -2,6 +2,9 @@ package fr.univ_cote_azur.ai_game_programming;
 
 import java.util.Scanner;
 
+/**
+ * Public class {@link Game} which simulate a game of awale.
+ */
 public class Game {
 
     // The number of Holes in the game
@@ -14,7 +17,9 @@ public class Game {
     private int scoreP1;
     private int scoreP2;
 
-
+    /**
+     * Constructor of the class. It initialies its attributes and the initial state of the game's board.
+     */
     public Game() {
         redSeeds = new int[NUMBER_OF_HOLES];
         blueSeeds = new int[NUMBER_OF_HOLES];
@@ -32,6 +37,9 @@ public class Game {
         }
     }
 
+    /**
+     * Main method of the class. This method allows to start a simulation of the game in {@link Main}.{@code main}
+     */
     public void start_game() {
         Scanner sc = new Scanner(System.in);
         boolean endGame = false;
