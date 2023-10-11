@@ -38,6 +38,7 @@ public class Game {
         boolean isP1_turn = false;
         String playerPlays = "";
 
+        printStateOfHoles();
         // Loop of the game
         while (!endGame) {
             isP1_turn = !isP1_turn;
@@ -50,8 +51,10 @@ public class Game {
 
             int lastHoleIndex = sowing(isP1_turn, holeNumberIndex, seedColor);
             capturing(isP1_turn, lastHoleIndex);
-            // Todo afficher les resultats
+            printStateOfHoles();
+            endGame = one_Player_Have_More_Then_Forty_Seeds() || isaDraw() || notEnoughSeeds();
         }
+        printResult();
     }
 
     private void validateInput(Boolean isP1_turns, @org.jetbrains.annotations.NotNull String input) {
@@ -183,4 +186,40 @@ public class Game {
         else return 0;
     }
 
+    private void printStateOfHoles(){
+        for (int i = 0; i < NUMBER_OF_HOLES/2; i++) {
+            System.out.print((i+1) + " ( "+ redSeeds[i] +"R, " + blueSeeds[i] +"B, " + tranparentSeeds[i] +"T )");
+        }
+        for (int i = NUMBER_OF_HOLES-1; i > NUMBER_OF_HOLES/2  ; i++) {
+            System.out.print((i+1) + " ( "+ redSeeds[i] +"R, " + blueSeeds[i] +"B, " + tranparentSeeds[i] +"T )");
+        }
+    }
+
+    private boolean one_Player_Have_More_Then_Forty_Seeds(){
+        return scoreP1 > 40 || scoreP2 > 40;
+    }
+
+    private boolean isaDraw(){
+        return scoreP1==40 && scoreP2 ==40;
+    }
+    private boolean notEnoughSeeds(){
+        return remainingSeeds() < 10;
+    }
+
+    private int remainingSeeds(){
+        int seedRemained = 0;
+        for (int i = 0; i < NUMBER_OF_HOLES; i++) {
+            seedRemained += redSeeds[i] + blueSeeds[i] + tranparentSeeds[i];
+        }
+        return seedRemained;
+    }
+
+    private void printResult(){
+        if (isaDraw())
+            System.out.println("It's a draw (score : " + scoreP1 + " ). Congratulations to both players.");
+        else if (scoreP1 > scoreP2)
+            System.out.println("Player 1 has won (score : " + scoreP1 + " ). Congratulations to both players.");
+        else
+            System.out.println("Player 2 has won (score : " + scoreP2 + " ). Congratulations to both players.");
+    }
 }
