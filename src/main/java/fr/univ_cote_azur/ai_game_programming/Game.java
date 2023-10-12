@@ -182,7 +182,7 @@ public class Game {
         int index = holeNumberIndex;
         for (int i = holeNumberIndex + 1; numberOfTransparentSeeds > 0; i++) {
             index = i % NUMBER_OF_HOLES;
-            if (index == holeNumberIndex || (index+1)%2 != polarityOfholes) continue;
+            if (index == holeNumberIndex || (index + 1) % 2 != polarityOfholes) continue;
             tranparentSeeds[index]++;
             numberOfTransparentSeeds--;
         }
@@ -195,7 +195,7 @@ public class Game {
         int index = holeNumberIndex;
         for (int i = holeNumberIndex + 1; numberOfBlueSeeds > 0; i++) {
             index = i % NUMBER_OF_HOLES;
-            if (index == holeNumberIndex || (index+1)%2 != polarityOfholes) continue;
+            if (index == holeNumberIndex || (index + 1) % 2 != polarityOfholes) continue;
             blueSeeds[index]++;
             numberOfBlueSeeds--;
         }
