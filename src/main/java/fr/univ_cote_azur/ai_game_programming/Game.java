@@ -210,10 +210,13 @@ public class Game {
      */
     private void capturing(boolean isP1_turns, int lastHoleIndex) {
         for (int i = lastHoleIndex; true; i--) {
-            int score = holesSeeds(i % NUMBER_OF_HOLES);
-            if (score == 0) break;
+            int index = (i + NUMBER_OF_HOLES) % NUMBER_OF_HOLES;
+            System.out.println("index capturing =" + index);
+            int score = holesSeeds(index);
+            if (score == 0) return;
             else if (isP1_turns) scoreP1 += score;
             else scoreP2 += score;
+            emptyHole(index);
         }
     }
 
@@ -221,6 +224,10 @@ public class Game {
         if ((redSeeds[index] + blueSeeds[index] + tranparentSeeds[index] == 2)) return 2;
         else if (redSeeds[index] + blueSeeds[index] + tranparentSeeds[index] == 3) return 3;
         else return 0;
+    }
+
+    private void emptyHole(int index){
+        redSeeds[index]= 0; blueSeeds[index] = 0; tranparentSeeds[index] = 0;
     }
 
     private void printBoard(){
