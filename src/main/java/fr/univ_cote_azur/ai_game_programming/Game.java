@@ -46,7 +46,7 @@ public class Game {
         boolean isP1_turn = false;
         String playerPlays = "";
 
-        printStateOfHoles();
+        printBoard();
         // Loop of the game
         while (!endGame) {
             isP1_turn = !isP1_turn;
@@ -71,7 +71,7 @@ public class Game {
                 return;
             }
             capturing(isP1_turn, lastHoleIndex);
-            printStateOfHoles();
+            printBoard();
             endGame = one_Player_Have_More_Then_Forty_Seeds() || isaDraw() || notEnoughSeeds();
         }
         printResult();
@@ -223,6 +223,13 @@ public class Game {
         else return 0;
     }
 
+    private void printBoard(){
+        printStateOfHoles();
+        System.out.println();
+        printScore();
+        System.out.println("-".repeat(90));
+    }
+
     private void printStateOfHoles() {
         for (int i = 0; i < NUMBER_OF_HOLES / 2; i++) {
             System.out.print((i + 1) + " ( " + redSeeds[i] + "R, " + blueSeeds[i] + "B, " + tranparentSeeds[i] + "T )  ");
@@ -232,6 +239,10 @@ public class Game {
             System.out.print((i + 1) + " ( " + redSeeds[i] + "R, " + blueSeeds[i] + "B, " + tranparentSeeds[i] + "T )  ");
         }
         System.out.println();
+    }
+    private void printScore() {
+        System.out.println("Score player 1 : " + scoreP1);
+        System.out.println("Score player 2 : " + scoreP2);
     }
 
     private boolean one_Player_Have_More_Then_Forty_Seeds() {
