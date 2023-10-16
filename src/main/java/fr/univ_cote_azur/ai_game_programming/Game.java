@@ -61,8 +61,6 @@ public class Game {
                 return;
             }
 
-
-            System.out.println("seed color :" + seedColor + "\nhole number :" + holeNumberIndex);
             int lastHoleIndex;
             try {
                 lastHoleIndex = sowing(isP1_turn, holeNumberIndex, seedColor);
@@ -211,7 +209,6 @@ public class Game {
     private void capturing(boolean isP1_turns, int lastHoleIndex) {
         for (int i = lastHoleIndex; true; i--) {
             int index = (i + NUMBER_OF_HOLES) % NUMBER_OF_HOLES;
-            System.out.println("index capturing =" + index);
             int score = holesSeeds(index);
             if (score == 0) return;
             else if (isP1_turns) scoreP1 += score;
