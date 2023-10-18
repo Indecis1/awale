@@ -186,7 +186,7 @@ public class PlayerTwo implements Player {
 
     private boolean opponentIsStarving() {
         for (int i = 0; i < NUMBER_OF_HOLES; i++) {
-            if (holes[i].isEven()) {
+            if (!holes[i].isEven()) {
                 if (!holes[i].isEmpty()) return false;
             }
         }
