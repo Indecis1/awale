@@ -169,6 +169,10 @@ public class PlayerOne implements Player {
     }
 
     private void capturing(int lastHoleId) {
+        if (opponentIsStarving()) {
+            score += sumSeeds();
+            return;
+        }
         for (int i = lastHoleId - 1; true; i--) {
             int index = (i + NUMBER_OF_HOLES) % NUMBER_OF_HOLES;
             int score = holes[index].sumSeeds();
@@ -178,4 +182,22 @@ public class PlayerOne implements Player {
             } else return;
         }
     }
+
+    private boolean opponentIsStarving() {
+        for (int i = 0; i < NUMBER_OF_HOLES; i++) {
+            if (holes[i].isEven()) {
+                if (!holes[i].isEmpty()) return false;
+            }
+        }
+        return true;
+    }
+
+    private int sumSeeds() {
+        int score = 0;
+        for (int i = 0; i < NUMBER_OF_HOLES; i++) {
+            score += holes[i].sumSeeds();
+        }
+        return score;
+    }
+
 }

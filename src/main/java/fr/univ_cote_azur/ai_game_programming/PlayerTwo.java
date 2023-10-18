@@ -3,6 +3,7 @@ package fr.univ_cote_azur.ai_game_programming;
 import java.util.Random;
 
 import static java.lang.System.exit;
+
 /**
  * Represents the second player of the game.
  */
@@ -50,7 +51,8 @@ public class PlayerTwo implements Player {
             validateInput(id_firstHole, seedColor);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-            exit(0);;
+            exit(0);
+            ;
         }
         System.out.println("Player Two play : " + id_firstHole + seedColor);
 
@@ -68,7 +70,7 @@ public class PlayerTwo implements Player {
         boolean possibleNumber = 1 <= holeNumberId && holeNumberId <= NUMBER_OF_HOLES;
         boolean possibleColor = seedColor == Color.R || seedColor == Color.B || seedColor == Color.TR || seedColor == Color.TB;
         if (!possibleNumber || !possibleColor)
-            throw new IllegalArgumentException("Impossible play from the last player... Impossible color or Number : "+ holeNumberId + seedColor +".");
+            throw new IllegalArgumentException("Impossible play from the last player... Impossible color or Number : " + holeNumberId + seedColor + ".");
     }
 
     private Object[] getPossiblePlay() {
@@ -106,7 +108,8 @@ public class PlayerTwo implements Player {
             isLegitPlay(id_firstHole, color);
         } catch (IllegalArgumentException e) {
             System.out.print(e.getMessage());
-            exit(0);;
+            exit(0);
+            ;
         }
         int number_of_seeds = holes[id_firstHole - 1].getColorSeeds(color);
         holes[id_firstHole - 1].emptiesColorHole(color);
@@ -127,7 +130,7 @@ public class PlayerTwo implements Player {
         int index = 0;
         for (int i = id_firstHole; number_of_seeds > 0; i++) {
             index = i % holes.length;
-            if (index == id_firstHole-1) continue;
+            if (index == id_firstHole - 1) continue;
             holes[index].incrementsColorSeeds(color);
             number_of_seeds--;
         }
@@ -138,7 +141,7 @@ public class PlayerTwo implements Player {
         int index = 0;
         for (int i = id_firstHole; number_of_seeds > 0; i++) {
             index = i % holes.length;
-            if (index == id_firstHole-1 || index % 2 == 1) continue;
+            if (index == id_firstHole - 1 || index % 2 == 1) continue;
             holes[index].incrementsColorSeeds(color);
             number_of_seeds--;
         }
@@ -167,6 +170,10 @@ public class PlayerTwo implements Player {
 
 
     private void capturing(int lastHoleId) {
+        if (opponentIsStarving()) {
+            score += sumSeeds();
+            return;
+        }
         for (int i = lastHoleId - 1; true; i--) {
             int index = (i + holes.length) % holes.length;
             int score = holes[index].sumSeeds();
@@ -175,6 +182,23 @@ public class PlayerTwo implements Player {
                 holes[index].emptiesHole();
             } else return;
         }
+    }
+
+    private boolean opponentIsStarving() {
+        for (int i = 0; i < NUMBER_OF_HOLES; i++) {
+            if (holes[i].isEven()) {
+                if (!holes[i].isEmpty()) return false;
+            }
+        }
+        return true;
+    }
+
+    private int sumSeeds() {
+        int score = 0;
+        for (int i = 0; i < NUMBER_OF_HOLES; i++) {
+            score += holes[i].sumSeeds();
+        }
+        return score;
     }
 
 
