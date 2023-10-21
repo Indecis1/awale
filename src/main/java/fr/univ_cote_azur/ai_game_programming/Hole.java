@@ -22,6 +22,13 @@ public class Hole {
         transparentSeeds = 1;
     }
 
+    public Hole(int id, int[] numberSeeds) {
+        this.id = id;
+        redSeeds = numberSeeds[0];
+        blueSeeds = numberSeeds[1];
+        transparentSeeds = numberSeeds[2];
+    }
+
     /**
      * Returns the number of seeds of the specified color in the hole.
      *

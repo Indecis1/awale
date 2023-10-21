@@ -41,18 +41,22 @@ public class PlayerTwo implements Player {
      * @param seedColor    the color of the seeds to play
      */
     @Override
-    public void nextPlay(int id_firstHole, Color seedColor) {
-        if (seedColor == null) {
+    public void nextPlay(Move move) {
+        int id_firstHole;
+        Color seedColor;
+        if (move.getColor() == null) {
             Object[] dataPlay = getPossiblePlay();
             id_firstHole = (Integer) dataPlay[0];
             seedColor = (Color) dataPlay[1];
+        } else {
+            id_firstHole = move.getIdHole();
+            seedColor = move.getColor();
         }
         try {
             validateInput(id_firstHole, seedColor);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             exit(0);
-            ;
         }
         System.out.println("Player Two play : " + id_firstHole + seedColor);
 
@@ -123,7 +127,7 @@ public class PlayerTwo implements Player {
         Hole hole = holes[id_firstHole - 1];
         if (!hole.isEven()) throw new IllegalArgumentException("Player Two can't sow an odd hole.\n");
         if (!hole.hasColorSeeds(color))
-            throw new IllegalArgumentException("Hole " + hole.getId() + "doesn't have seeds of this color :" + color + ".\n");
+            throw new IllegalArgumentException("Hole " + hole.getId() + " doesn't have seeds of this color :" + color + ".\n");
     }
 
     private int sowingRed(int id_firstHole, Color color, int number_of_seeds) {
@@ -165,7 +169,12 @@ public class PlayerTwo implements Player {
      */
     @Override
     public void setHoles(Hole[] holes) {
-        this.holes = holes;
+        int i = 0;
+        for (Hole hole :
+                holes){
+            this.holes[i] = new Hole(hole.getId(), new int[] {hole.getColorSeeds(Color.R),hole.getColorSeeds(Color.B),hole.getColorSeeds(Color.TR)});
+            i++;
+        }
     }
 
 
@@ -184,13 +193,23 @@ public class PlayerTwo implements Player {
         }
     }
 
-    private boolean opponentIsStarving() {
+    public boolean opponentIsStarving() {
         for (int i = 0; i < NUMBER_OF_HOLES; i++) {
             if (!holes[i].isEven()) {
                 if (!holes[i].isEmpty()) return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Method used to reset the score to it's origin value after an iteration of the min-max algorithm
+     *
+     * @param resetScore the value of the score {@link Integer}
+     */
+    @Override
+    public void resetScore(int resetScore) {
+        score = resetScore;
     }
 
     private int sumSeeds() {

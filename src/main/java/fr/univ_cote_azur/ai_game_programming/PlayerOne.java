@@ -42,11 +42,16 @@ public class PlayerOne implements Player {
      * @param seedColor    the color of the seeds to play
      */
     @Override
-    public void nextPlay(int id_firstHole, Color seedColor) {
-        if (seedColor == null) {
+    public void nextPlay(Move move) {
+        int id_firstHole;
+        Color seedColor;
+        if (move.getColor() == null) {
             Object[] dataPlay = getPossiblePlay();
             id_firstHole = (Integer) dataPlay[0];
             seedColor = (Color) dataPlay[1];
+        } else {
+            id_firstHole = move.getIdHole();
+            seedColor = move.getColor();
         }
         try {
             validateInput(id_firstHole, seedColor);
@@ -65,6 +70,27 @@ public class PlayerOne implements Player {
         }
         capturing(lastHoleId);
     }
+//    @Override
+//    public void nextPlay(Move move) {
+//        int id_firstHole = move.getIdHole();
+//        Color seedColor = move.getColor();
+//        try {
+//            validateInput(id_firstHole, seedColor);
+//        } catch (IllegalArgumentException e) {
+//            System.out.println(e.getMessage());
+//            exit(0);
+//        }
+//
+//        System.out.println("Player One play : " + id_firstHole + seedColor);
+//        int lastHoleId;
+//        try {
+//            lastHoleId = sowing(id_firstHole, seedColor);
+//        } catch (IllegalArgumentException e) {
+//            System.out.println(e.getMessage());
+//            return;
+//        }
+//        capturing(lastHoleId);
+//    }
 
     private void validateInput(int holeNumberId, Color seedColor) {
         boolean possibleNumber = 1 <= holeNumberId && holeNumberId <= NUMBER_OF_HOLES;
@@ -165,7 +191,12 @@ public class PlayerOne implements Player {
      */
     @Override
     public void setHoles(Hole[] holes) {
-        this.holes = holes;
+        int i = 0;
+        for (Hole hole :
+        holes){
+            this.holes[i] = new Hole(hole.getId(), new int[] {hole.getColorSeeds(Color.R),hole.getColorSeeds(Color.B),hole.getColorSeeds(Color.TR)});
+            i++;
+        }
     }
 
     private void capturing(int lastHoleId) {
@@ -183,13 +214,23 @@ public class PlayerOne implements Player {
         }
     }
 
-    private boolean opponentIsStarving() {
+    public boolean opponentIsStarving() {
         for (int i = 0; i < NUMBER_OF_HOLES; i++) {
             if (holes[i].isEven()) {
                 if (!holes[i].isEmpty()) return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Method used to reset the score to it's origin value after an iteration of the min-max algorithm
+     *
+     * @param resetScore the value of the score {@link Integer}
+     */
+    @Override
+    public void resetScore(int resetScore) {
+        score = resetScore;
     }
 
     private int sumSeeds() {

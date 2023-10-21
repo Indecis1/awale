@@ -11,7 +11,7 @@ public class Game {
     private Hole[] holes;
     private Scanner sc;
     private boolean AIplaysAsPlayerOne;
-    private Player player;
+    private Player ia;
     private Player opponent;
 
     /**
@@ -26,13 +26,14 @@ public class Game {
     }
 
     private void initiatePlayer() {
-        whoStarts();
+        //whoStarts();
+        AIplaysAsPlayerOne = true; // to del
         if (AIplaysAsPlayerOne) {
-            player = new PlayerOne(NUMBER_OF_HOLES);
+            ia = new PlayerOne(NUMBER_OF_HOLES);
             opponent = new PlayerTwo(NUMBER_OF_HOLES);
         } else {
             opponent = new PlayerOne(NUMBER_OF_HOLES);
-            player = new PlayerTwo(NUMBER_OF_HOLES);
+            ia = new PlayerTwo(NUMBER_OF_HOLES);
         }
     }
 
@@ -43,44 +44,42 @@ public class Game {
     }
 
     private void whoStarts() {
-        System.out.print("Is our AI player One ? [Y/N]");
+        System.out.print("Is our AI ia One ? [Y/N]");
         AIplaysAsPlayerOne = sc.nextLine().equals("Y");
     }
 
     /**
      * Heart of the game. This method allow to start a game.
-     * It determines which player's gonna be the AI and start the right module.
+     * It determines which ia's gonna be the AI and start the right module.
      * Then, it print the result of the game.
      */
     public void startGame() {
         printBorad();
-        if (AIplaysAsPlayerOne) caseWeArePlayerOne();
-        else caseWeArePlayerTwo();
-        // caseAIvsAI();
+//        if (AIplaysAsPlayerOne) caseWeArePlayerOne();
+//        else caseWeArePlayerTwo();
+        caseMinMaxvsAI();
 
-        if(player.getScore() > opponent.getScore()){
-            System.out.print("Joueur 1 won ; score : " + player.getScore());
-        }
-
-        else if(player.getScore() < opponent.getScore())
-            System.out.print("Joueur 2 won ; score : " + opponent.getScore());
-        else
-            System.out.print("It's a draw ; scores : " + player.getScore());
+        if (ia.getScore() > opponent.getScore()) {
+            System.out.print("Amine's IA won ; score : " + ia.getScore());
+        } else if (ia.getScore() < opponent.getScore())
+            System.out.print("Opponent won ; score : " + opponent.getScore());
+        else System.out.print("It's a draw ; scores : " + ia.getScore());
     }
 
     private void caseAIvsAI() {
         boolean endGame = false;
         while (!endGame) {
             /**     Player 1 -- AI     **/
-            player.setHoles(holes);
-            player.nextPlay(0, null);
-            holes = player.getHoles();
+            ia.setHoles(holes);
+            Move bestMove = minMax.decision(ia);
+            ia.nextPlay(bestMove);
+            holes = ia.getHoles();
             printBorad();
 
 
             /**     Player 2 -- AI   **/
             opponent.setHoles(holes);
-            opponent.nextPlay(0, null);
+            opponent.nextPlay(new Move(0, null));
             holes = opponent.getHoles();
             printBorad();
 
@@ -89,15 +88,43 @@ public class Game {
         }
     }
 
+    private void caseMinMaxvsAI() {
+        boolean endGame = false;
+//        while (!endGame) {
+//            /**     Player 1 -- AI     **/
+//            ia.setHoles(holes);
+//            Move bestMove = minMax.decision(ia);
+//            System.out.print("Moov min max : " +bestMove.getIdHole() + bestMove.getColor());
+//            System.out.print(ia.nextPlay(bestMove));
+//            holes = ia.getHoles();
+//            printBorad();
+//
+//
+//            /**     Player 2 -- AI   **/
+//            opponent.setHoles(holes);
+//            System.out.print(opponent.nextPlay(new Move(0, null)));
+//            holes = opponent.getHoles();
+//            printBorad();
+//
+//            /** check the end of the game **/
+//            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
+//        }
+                ia.setHoles(holes);
+                Move bestMove = minMax.decision(ia);
+                System.out.print("Moov min max : " +bestMove.getIdHole() + bestMove.getColor());
+    }
+
     private void caseWeArePlayerOne() {
         boolean endGame = false;
         while (!endGame) {
             /**     Player 1 -- AI     **/
-            player.setHoles(holes);
-            player.nextPlay(0, null);
-            holes = player.getHoles();
+            ia.setHoles(holes);
+            ia.nextPlay(new Move(0, null));
+            holes = ia.getHoles();
             printBorad();
 
+
+            if (ia.opponentIsStarving()) break;
 
             /**     Player 2 -- opponent   **/
             opponent.setHoles(holes);
@@ -105,12 +132,12 @@ public class Game {
             String playerPlays = sc.nextLine();
             Color seedColor = getSeedColor(playerPlays);
             int holeNumberId = getHoleId(playerPlays);
-            opponent.nextPlay(holeNumberId, seedColor);
+            opponent.nextPlay(new Move(holeNumberId, seedColor));
             holes = opponent.getHoles();
             printBorad();
 
             /** check the end of the game **/
-            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
+            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds() || opponent.opponentIsStarving();
         }
     }
 
@@ -123,19 +150,20 @@ public class Game {
             String playerPlays = sc.nextLine();
             Color seedColor = getSeedColor(playerPlays);
             int holeNumberId = getHoleId(playerPlays);
-            opponent.nextPlay(holeNumberId, seedColor);
+            opponent.nextPlay(new Move(holeNumberId, seedColor));
             holes = opponent.getHoles();
             printBorad();
 
+            if (opponent.opponentIsStarving()) break;
 
             /**     Player 2 -- our AI    **/
-            player.setHoles(holes);
-            player.nextPlay(0, null);
-            holes = player.getHoles();
+            ia.setHoles(holes);
+            ia.nextPlay(new Move(0, null));
+            holes = ia.getHoles();
             printBorad();
 
             /** check the end of the game **/
-            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
+            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds() || ia.opponentIsStarving();
         }
     }
 
@@ -178,24 +206,23 @@ public class Game {
             System.out.print(" -- ");
         }
         System.out.println();
-        for (int i = NUMBER_OF_HOLES-1; i >= NUMBER_OF_HOLES / 2; i--) {
+        for (int i = NUMBER_OF_HOLES - 1; i >= NUMBER_OF_HOLES / 2; i--) {
             holes[i].printHole();
             System.out.print(" -- ");
         }
         System.out.println();
-        if (player instanceof PlayerOne)
-            System.out.println("Score player 1 : " + player.getScore() + "\nScore Player 2 : " + opponent.getScore());
-        else
-            System.out.println("Score player 1 : " + opponent.getScore() + "\nScore Player 2 : " + player.getScore());
+        if (ia instanceof PlayerOne)
+            System.out.println("Score ia : " + ia.getScore() + "\nScore opponent : " + opponent.getScore());
+        else System.out.println("Score opponent : " + opponent.getScore() + "\nScore ia : " + ia.getScore());
         System.out.println("-".repeat(90));
     }
 
     private boolean one_Player_Have_More_Then_Forty_Seeds() {
-        return player.getScore() > 40 || opponent.getScore() > 40;
+        return ia.getScore() > 40 || opponent.getScore() > 40;
     }
 
     private boolean isaDraw() {
-        return player.getScore() == 40 && opponent.getScore() == 40;
+        return ia.getScore() == 40 && opponent.getScore() == 40;
     }
 
     private boolean notEnoughSeeds() {

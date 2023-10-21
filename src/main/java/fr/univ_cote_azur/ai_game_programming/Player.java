@@ -15,10 +15,9 @@ public interface Player {
     /**
      * Performs the next play for the player.
      *
-     * @param id_firstHole the ID of the first hole to play from
-     * @param seedColor    the color of the seeds to play
+     * @param move {@link Move} choosed by the player.
      */
-    public void nextPlay(int id_firstHole, Color seedColor);
+    public void nextPlay(Move move);
 
     /**
      * Retrieves the holes of the player after the change he has applied.
@@ -33,5 +32,19 @@ public interface Player {
      * @param holes the array of holes to set
      */
     public void setHoles(Hole[] holes);
+
+    /**
+     * Determines whenever the opponent is starving or not
+     *
+     * @return true if the oppoenent in starving, otherwise returns false.
+     */
+    public boolean opponentIsStarving();
+
+    /**
+     * Method used to reset the score to it's origin value after an iteration of the min-max algorithm
+     *
+     * @param resetScore the value of the score {@link Integer}
+     */
+    public void resetScore(int resetScore);
 
 }
