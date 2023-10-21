@@ -1,7 +1,27 @@
 package fr.univ_cote_azur.ai_game_programming;
 
 public enum Color {
-    RED, BLUE, TRANSPARENT_RED, TRANSPARENT_BLUE;
+    RED{
+        @Override
+        public String toString() {
+            return "R";
+        }
+    }, BLUE{
+        @Override
+        public String toString() {
+            return "B";
+        }
+    }, TRANSPARENT_RED{
+        @Override
+        public String toString() {
+            return "TR";
+        }
+    }, TRANSPARENT_BLUE{
+        @Override
+        public String toString() {
+            return "TB";
+        }
+    };
 
     public static Color parse(String str){
         if(str.equalsIgnoreCase("R")){

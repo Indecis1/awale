@@ -1,12 +1,12 @@
 package fr.univ_cote_azur.ai_game_programming;
 
 
-public class Board {
+public class Board implements Cloneable {
 
-    private final int[] playerSeeds = new int[2];
-    private final int[] redSeedBoard = new int[16];
-    private final int[] blueSeedBoard = new int[16];
-    private final int[] transparentSeedBoard = new int[16];
+    private int[] playerSeeds = new int[2];
+    private int[] redSeedBoard = new int[16];
+    private int[] blueSeedBoard = new int[16];
+    private int[] transparentSeedBoard = new int[16];
 
     public Board(){
         for(int i = 0; i<16; i++){
@@ -78,7 +78,13 @@ public class Board {
         int i;
         int seeds = board[start];
         board[start] = 0;
-        for (i = start + 1; i < start+seeds+1; i++){
+        int endCell = start+seeds + 1;
+        if (seeds % 16 == 0)
+            endCell += seeds / 16;
+        int startIndex = start % 16;
+        for (i = start + 1; i < endCell; i++){
+            if ((i % 16) == startIndex)
+                continue;
             board[i % 16] += 1;
         }
         return (i-1) % 16;
@@ -155,6 +161,38 @@ public class Board {
         return -1;
     }
 
+    public int[] getPlayerSeeds() {
+        return playerSeeds;
+    }
+
+    public void setPlayerSeeds(int[] playerSeeds) {
+        this.playerSeeds = playerSeeds;
+    }
+
+    public int[] getRedSeedBoard() {
+        return redSeedBoard;
+    }
+
+    public void setRedSeedBoard(int[] redSeedBoard) {
+        this.redSeedBoard = redSeedBoard;
+    }
+
+    public int[] getBlueSeedBoard() {
+        return blueSeedBoard;
+    }
+
+    public void setBlueSeedBoard(int[] blueSeedBoard) {
+        this.blueSeedBoard = blueSeedBoard;
+    }
+
+    public int[] getTransparentSeedBoard() {
+        return transparentSeedBoard;
+    }
+
+    public void setTransparentSeedBoard(int[] transparentSeedBoard) {
+        this.transparentSeedBoard = transparentSeedBoard;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -168,5 +206,20 @@ public class Board {
         sb.append("Seeds Captured by Player 1: ").append(playerSeeds[0]).append("\n");
         sb.append("Seeds Captured by Player 2: ").append(playerSeeds[1]).append("\n");
         return sb.toString();
+    }
+
+    @Override
+    public Board clone() {
+        try {
+            Board board = (Board) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            board.setPlayerSeeds(playerSeeds);
+            board.setBlueSeedBoard(blueSeedBoard);
+            board.setRedSeedBoard(redSeedBoard);
+            board.setTransparentSeedBoard(transparentSeedBoard);
+            return board;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 }
