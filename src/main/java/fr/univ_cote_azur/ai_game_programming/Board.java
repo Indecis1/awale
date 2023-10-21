@@ -65,7 +65,7 @@ public class Board implements Cloneable {
             case TRANSPARENT_BLUE -> lastHole = playBlue(start, transparentSeedBoard);
         }
         playerSeeds[start % 2] += capture(lastHole);
-        return checkVictory();
+        return checkVictory(player);
     }
 
     /**
@@ -130,10 +130,11 @@ public class Board implements Cloneable {
     }
 
     /**
-     *
+     * @param player the 0-based player number (0 for the first and 1 for the second)
      * @return the player who win the game. If it is a draw return 0 otherwise return -1
      */
-    private int checkVictory(){
+    private int checkVictory(int player){
+        int[] nextPlayer = {1, 0};
         //TODO when do we have a draw
         if(playerSeeds[0] >= 50 && playerSeeds[1] >= 50)
             return 0;
@@ -141,23 +142,20 @@ public class Board implements Cloneable {
             return 1;
         else if (playerSeeds[1] >= 50)
             return 2;
-        return detectHungriness();
+        return detectHungriness(nextPlayer[player]);
     }
 
 
     /**
+     * @param player the 0-based player number (0 for the first and 1 for the second)
      * Detect if one of the player is hungry return -1 if none are hungry and the player number otherwise
      */
-    private int detectHungriness(){
+    private int detectHungriness(int player){
         int playerSeeds = 0;
-        for (int i=0; i<16; i=i+2){
+        for (int i=player; i<16; i=i+2){
             playerSeeds += redSeedBoard[i] + blueSeedBoard[i] + transparentSeedBoard[i];
         }
-        if(playerSeeds == 0) return 1;
-        for (int i=1; i<16; i=i+2){
-            playerSeeds += redSeedBoard[i] + blueSeedBoard[i] + transparentSeedBoard[i];
-        }
-        if(playerSeeds == 0) return 2;
+        if(playerSeeds == 0) return (player + 1);
         return -1;
     }
 
