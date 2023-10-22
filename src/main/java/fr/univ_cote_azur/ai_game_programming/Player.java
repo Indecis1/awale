@@ -14,10 +14,22 @@ public interface Player {
 
     /**
      * Performs the next play for the player.
+     * If the color is null, we set a random possible play. Useful to continue the game if our AI couldn't find a solution...
+     * Then, we verify that the move is possible is a possible color.
+     * After that, we can sow and capture.
+     * Note: when we sow, there's a second check to see if the play is legit.
+     *
+     * @param move The {@link Move} which is going to be played by {@code this}.
+     * @throws IllegalArgumentException if the param is not a valid play.
+     */
+    public void nextPlay(Move move);
+
+    /**
+     * Simulate the next play for the player.
      *
      * @param move {@link Move} choosed by the player.
      */
-    public void nextPlay(Move move);
+    public void simulate_NextPlay(Move move);
 
     /**
      * Retrieves the holes of the player after the change he has applied.

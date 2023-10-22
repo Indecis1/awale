@@ -22,6 +22,12 @@ public class Hole {
         transparentSeeds = 1;
     }
 
+    /**
+     * Construct a new hole with an ID and define the number of seeds per color on each hole.
+     * This construct is used by {@link minMax} to deeply copy a hole.
+     * @param id the id of the hole.
+     * @param numberSeeds the number of seeds per color in the new hole.
+     */
     public Hole(int id, int[] numberSeeds) {
         this.id = id;
         redSeeds = numberSeeds[0];

@@ -26,8 +26,7 @@ public class Game {
     }
 
     private void initiatePlayer() {
-        //whoStarts();
-        AIplaysAsPlayerOne = true; // to del
+        whoStarts();
         if (AIplaysAsPlayerOne) {
             ia = new PlayerOne(NUMBER_OF_HOLES);
             opponent = new PlayerTwo(NUMBER_OF_HOLES);
@@ -44,24 +43,23 @@ public class Game {
     }
 
     private void whoStarts() {
-        System.out.print("Is our AI ia One ? [Y/N]");
+        System.out.print("Is our AI player One ? [Y/N]");
         AIplaysAsPlayerOne = sc.nextLine().equals("Y");
     }
 
     /**
      * Heart of the game. This method allow to start a game.
-     * It determines which ia's gonna be the AI and start the right module.
-     * Then, it print the result of the game.
+     * It determines which player's gonna be the AI and start the right module.
+     * Then, it prints the result of the game.
      */
     public void startGame() {
-        printBorad();
-//        if (AIplaysAsPlayerOne) caseWeArePlayerOne();
-//        else caseWeArePlayerTwo();
-        caseMinMaxvsAI();
+        printBoard();
+        if (AIplaysAsPlayerOne) case_AI_isPlayerOne();
+        else case_AI_isPlayerTwo();
 
-        if (ia.getScore() > opponent.getScore()) {
+        if (ia.getScore() > opponent.getScore())
             System.out.print("Amine's IA won ; score : " + ia.getScore());
-        } else if (ia.getScore() < opponent.getScore())
+        else if (ia.getScore() < opponent.getScore())
             System.out.print("Opponent won ; score : " + opponent.getScore());
         else System.out.print("It's a draw ; scores : " + ia.getScore());
     }
@@ -74,59 +72,39 @@ public class Game {
             Move bestMove = minMax.decision(ia);
             ia.nextPlay(bestMove);
             holes = ia.getHoles();
-            printBorad();
+            printBoard();
 
 
             /**     Player 2 -- AI   **/
             opponent.setHoles(holes);
             opponent.nextPlay(new Move(0, null));
             holes = opponent.getHoles();
-            printBorad();
+            printBoard();
 
             /** check the end of the game **/
             endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
         }
     }
 
-    private void caseMinMaxvsAI() {
-        boolean endGame = false;
-//        while (!endGame) {
-//            /**     Player 1 -- AI     **/
-//            ia.setHoles(holes);
-//            Move bestMove = minMax.decision(ia);
-//            System.out.print("Moov min max : " +bestMove.getIdHole() + bestMove.getColor());
-//            System.out.print(ia.nextPlay(bestMove));
-//            holes = ia.getHoles();
-//            printBorad();
-//
-//
-//            /**     Player 2 -- AI   **/
-//            opponent.setHoles(holes);
-//            System.out.print(opponent.nextPlay(new Move(0, null)));
-//            holes = opponent.getHoles();
-//            printBorad();
-//
-//            /** check the end of the game **/
-//            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
-//        }
-                ia.setHoles(holes);
-                Move bestMove = minMax.decision(ia);
-                System.out.print("Moov min max : " +bestMove.getIdHole() + bestMove.getColor());
-    }
-
-    private void caseWeArePlayerOne() {
+    private void case_AI_isPlayerOne() {
         boolean endGame = false;
         while (!endGame) {
+
             /**     Player 1 -- AI     **/
-            ia.setHoles(holes);
-            ia.nextPlay(new Move(0, null));
-            holes = ia.getHoles();
-            printBorad();
+            int score_actual = ia.getScore();
+            ia.setHoles(holes.clone());
+            Move bestMove = minMax.decision(ia);
+            System.out.println("Moov min max : " + bestMove.getIdHole() + bestMove.getColor());
+            ia.resetScore(score_actual);
+            ia.setHoles(holes.clone());
+            ia.nextPlay(bestMove);
+            holes = ia.getHoles().clone();
+            printBoard();
 
+            if (ia.opponentIsStarving())
+                return;
 
-            if (ia.opponentIsStarving()) break;
-
-            /**     Player 2 -- opponent   **/
+            /**     Player 2 -- opponent **/
             opponent.setHoles(holes);
             askPlayerNextPlay(AIplaysAsPlayerOne);
             String playerPlays = sc.nextLine();
@@ -134,17 +112,17 @@ public class Game {
             int holeNumberId = getHoleId(playerPlays);
             opponent.nextPlay(new Move(holeNumberId, seedColor));
             holes = opponent.getHoles();
-            printBorad();
+            printBoard();
 
             /** check the end of the game **/
-            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds() || opponent.opponentIsStarving();
+            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
         }
     }
 
-    private void caseWeArePlayerTwo() {
+    private void case_AI_isPlayerTwo() {
         boolean endGame = false;
         while (!endGame) {
-            /**     Player 1 -- oppoenent     **/
+            /**     Player 1 -- opponent   **/
             opponent.setHoles(holes);
             askPlayerNextPlay(AIplaysAsPlayerOne);
             String playerPlays = sc.nextLine();
@@ -152,18 +130,21 @@ public class Game {
             int holeNumberId = getHoleId(playerPlays);
             opponent.nextPlay(new Move(holeNumberId, seedColor));
             holes = opponent.getHoles();
-            printBorad();
+            printBoard();
 
-            if (opponent.opponentIsStarving()) break;
-
-            /**     Player 2 -- our AI    **/
-            ia.setHoles(holes);
-            ia.nextPlay(new Move(0, null));
-            holes = ia.getHoles();
-            printBorad();
+            /**     Player 2 -- AI     **/
+            int score_actual = ia.getScore();
+            ia.setHoles(holes.clone());
+            Move bestMove = minMax.decision(ia);
+            System.out.println("Moov min max : " + bestMove.getIdHole() + bestMove.getColor());
+            ia.resetScore(score_actual);
+            ia.setHoles(holes.clone());
+            ia.nextPlay(bestMove);
+            holes = ia.getHoles().clone();
+            printBoard();
 
             /** check the end of the game **/
-            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds() || ia.opponentIsStarving();
+            endGame = notEnoughSeeds() || isaDraw() || one_Player_Have_More_Then_Forty_Seeds();
         }
     }
 
@@ -200,7 +181,7 @@ public class Game {
         return holeNumberId;
     }
 
-    private void printBorad() {
+    private void printBoard() {
         for (int i = 0; i < NUMBER_OF_HOLES / 2; i++) {
             holes[i].printHole();
             System.out.print(" -- ");

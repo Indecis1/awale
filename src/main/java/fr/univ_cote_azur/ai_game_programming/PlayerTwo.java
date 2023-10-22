@@ -25,20 +25,14 @@ public class PlayerTwo implements Player {
     }
 
     /**
-     * Retrieves the score of the player.
-     *
-     * @return the player's score
-     */
-    @Override
-    public int getScore() {
-        return score;
-    }
-
-    /**
      * Performs the next play for the player.
+     * If the color is null, we set a random possible play. Useful to continue the game if our AI couldn't find a solution...
+     * Then, we verify that the move is possible is a possible color.
+     * After that, we can sow and capture.
+     * Note: when we sow, there's a second check to see if the play is legit.
      *
-     * @param id_firstHole the ID of the first hole to play from
-     * @param seedColor    the color of the seeds to play
+     * @param move The {@link Move} which is going to be played by {@code this}.
+     * @throws IllegalArgumentException if the param is not a valid play.
      */
     @Override
     public void nextPlay(Move move) {
@@ -59,6 +53,41 @@ public class PlayerTwo implements Player {
             exit(0);
         }
         System.out.println("Player Two play : " + id_firstHole + seedColor);
+
+        int lastHoleId;
+        try {
+            lastHoleId = sowing(id_firstHole, seedColor);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+        capturing(lastHoleId);
+    }
+
+    /**
+     * Simulate the next play for the player. This method is used in {@link minMax}  to not perform a move and only simulate it.
+     *
+     * @param move The {@link Move} which is going to be played by {@code this}.
+     * @throws IllegalArgumentException if the {@param move} is not a valid play.
+     */
+    @Override
+    public void simulate_NextPlay(Move move) {
+        int id_firstHole;
+        Color seedColor;
+        if (move.getColor() == null) {
+            Object[] dataPlay = getPossiblePlay();
+            id_firstHole = (Integer) dataPlay[0];
+            seedColor = (Color) dataPlay[1];
+        } else {
+            id_firstHole = move.getIdHole();
+            seedColor = move.getColor();
+        }
+        try {
+            validateInput(id_firstHole, seedColor);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            exit(0);
+        }
 
         int lastHoleId;
         try {
@@ -172,8 +201,7 @@ public class PlayerTwo implements Player {
         int i = 0;
         for (Hole hole :
                 holes){
-            this.holes[i] = new Hole(hole.getId(), new int[] {hole.getColorSeeds(Color.R),hole.getColorSeeds(Color.B),hole.getColorSeeds(Color.TR)});
-            i++;
+            this.holes[i++] = new Hole(hole.getId(), new int[] {hole.getColorSeeds(Color.R),hole.getColorSeeds(Color.B),hole.getColorSeeds(Color.TR)});
         }
     }
 
@@ -193,6 +221,10 @@ public class PlayerTwo implements Player {
         }
     }
 
+    /**
+     * Verify if the opponent is starving.
+     * @return true if the opponent is starving; false else.
+     */
     public boolean opponentIsStarving() {
         for (int i = 0; i < NUMBER_OF_HOLES; i++) {
             if (!holes[i].isEven()) {
@@ -203,7 +235,7 @@ public class PlayerTwo implements Player {
     }
 
     /**
-     * Method used to reset the score to it's origin value after an iteration of the min-max algorithm
+     * Method used to reset the score to its origin value after an iteration of the min-max algorithm
      *
      * @param resetScore the value of the score {@link Integer}
      */
@@ -220,5 +252,13 @@ public class PlayerTwo implements Player {
         return score;
     }
 
-
+    /**
+     * Retrieves the score of the player.
+     *
+     * @return the player's score
+     */
+    @Override
+    public int getScore() {
+        return score;
+    }
 }

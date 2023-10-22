@@ -3,11 +3,23 @@ package fr.univ_cote_azur.ai_game_programming;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * This class is the heart of our AI. This is our algorithm to determine the best move to play at the x-moment of
+ * the game.
+ */
 public class minMax {
 
+    private static Stack<Holes> original_holes;
+
+    /**
+     * The recursive of our min-max algorithm starts here.
+     * @param player the player for whom the best next move is computed.
+     * @return the best {@link Move} to play for {@param player} at x-moment of the game.
+     */
     public static Move decision(Player player) {
         boolean isMax = true;
         int maxDepth = 2;
+        original_holes = new Stack<>();
         Move bestMove = new Move(0, null);
         return decisionMinMax(player, bestMove, isMax, maxDepth);
     }
@@ -33,32 +45,25 @@ public class minMax {
      */
     private static Move decisionMinMax(Player player, Move parentMove, boolean isMax, int maxDepth) {
 
-
+        original_holes.push(new Holes(player.getHoles().clone()));
         // Get all the legit move
         ArrayList<Move> legitMove = new ArrayList<>();
-        createListeOfLegitMove(player, legitMove, player.getHoles());
+        createListeOfLegitMove(player, legitMove, original_holes.peek().holes);
 
 
-        int initial_score = parentMove.getScoreEvalutation();
-
-        System.out.println("Profondeur :" + maxDepth + ". isMax :" + isMax + ". Size :" + legitMove.size() + ". Score :" + initial_score);
-
+        final int initial_score = parentMove.getScoreEvaluation();
 
         for (Move move : legitMove) {
 
-
-            System.out.print("Original holes pour la profondeur " + maxDepth + " avant le move " + move.getIdHole() + move.getColor() + " :");
-            for (Hole h : move.getHoles()) {
-                h.printHole();
-            }
+            Hole[] depth_holes = original_holes.peek().holes;
 
             // Resetting the holes and the score.
-            player.setHoles(move.getHoles());
+            player.setHoles(depth_holes.clone());
             player.resetScore(initial_score);
 
 
             // Simulate the legit move and adjust the estimated score after the move
-            player.nextPlay(move);
+            player.simulate_NextPlay(move);
             int after_score = player.getScore();
 
             adjust_evaluationScore(move, after_score - initial_score, isMax);
@@ -69,9 +74,13 @@ public class minMax {
             opponent.setHoles(player.getHoles());
 
             if (maxDepth - 1 > 0)
-                move.setScoreEvalutation(decisionMinMax(opponent, move, !isMax, maxDepth - 1).getScoreEvalutation());
+                move.setScoreEvaluation(decisionMinMax(opponent, move, !isMax, maxDepth - 1).getScoreEvaluation());
 
         }
+
+        original_holes.pop();
+        player.resetScore(initial_score);
+        if (legitMove.isEmpty()) return parentMove;
         return selectMinMax(legitMove, isMax);
     }
 
@@ -94,7 +103,7 @@ public class minMax {
         for (int i = 1; i < legitMove.size(); i++) {
             Move currentMove = legitMove.get(i);
 
-            if (currentMove.getScoreEvalutation() > max.getScoreEvalutation()) {
+            if (currentMove.getScoreEvaluation() > max.getScoreEvaluation()) {
                 max = currentMove;
             }
         }
@@ -108,7 +117,7 @@ public class minMax {
         for (int i = 1; i < legitMove.size(); i++) {
             Move currentMove = legitMove.get(i);
 
-            if (currentMove.getScoreEvalutation() < min.getScoreEvalutation()) {
+            if (currentMove.getScoreEvaluation() < min.getScoreEvaluation()) {
                 min = currentMove;
             }
         }
@@ -139,4 +148,9 @@ public class minMax {
             }
         }
     }
+
+    private record Holes(Hole[] holes) {
+
+    }
+
 }
