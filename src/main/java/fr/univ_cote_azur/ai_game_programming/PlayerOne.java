@@ -194,7 +194,7 @@ public class PlayerOne implements Player {
     }
 
     /**
-     * Sets the state holes as they are after the play of the opponents..
+     * Sets the state holes as they are after the play of the opponents.
      *
      * @param holes the array of holes to set
      */
@@ -207,22 +207,20 @@ public class PlayerOne implements Player {
     }
 
     private void capturing(int lastHoleId) {
-        if (opponentIsStarving()) {
-            score += sumSeeds();
-            return;
-        }
         for (int i = lastHoleId - 1; true; i--) {
             int index = (i + NUMBER_OF_HOLES) % NUMBER_OF_HOLES;
             int score = holes[index].sumSeeds();
             if (score == 2 || score == 3) {
                 this.score += score;
                 holes[index].emptiesHole();
-            } else return;
+            } else break;
         }
+        if (opponentIsStarving()) score += sumSeeds();
     }
 
     /**
      * Verify if the opponent is starving.
+     *
      * @return true if the opponent is starving; false else.
      */
     public boolean opponentIsStarving() {

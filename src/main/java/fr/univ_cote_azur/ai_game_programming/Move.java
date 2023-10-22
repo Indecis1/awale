@@ -4,7 +4,7 @@ package fr.univ_cote_azur.ai_game_programming;
  * A class which represents a move. It has three private attributes : {@link Hole}[] idHole, {@link Color} color,
  * {@link Integer} scoreEvaluation.
  * This class was created only to represent a move in the {@link minMax} algorithm. There was a problem in the memory
- * references during the recursion, we partially solved the probleme with this class and some deep copy.
+ * references during the recursion, we partially solved the problem with this class and some deep copy.
  */
 public class Move {
 
@@ -21,21 +21,6 @@ public class Move {
     public Move(int idHole, Color color) {
         this.idHole = idHole;
         this.color = color;
-        scoreEvaluation = 0;
-    }
-
-    /**
-     * Second constructor of the class. This constructor is mainly used in {@link minMax} to create a new move with
-     * predefined holes in order to simulate the plays on this holes, and not the originals.
-     *
-     * @param idHole set the private attribute {@code this.idHole} to this {@link Integer} value.
-     * @param color  set the private attribute {@code this.color} to this {{@link Color}} color.
-     * @param holes  set the private attribute {@code this.holes} to this {{@link Hole}}[] array.
-     */
-    public Move(int idHole, Color color, Hole[] holes) {
-        this.idHole = idHole;
-        this.color = color;
-        this.holes = holes;
         scoreEvaluation = 0;
     }
 
@@ -67,7 +52,7 @@ public class Move {
     }
 
     /**
-     * Set the evaluated score the its new value.
+     * Set the evaluated score the new value.
      *
      * @param scoreEvaluation new value of the evaluated score.
      */

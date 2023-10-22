@@ -198,30 +198,27 @@ public class PlayerTwo implements Player {
     @Override
     public void setHoles(Hole[] holes) {
         int i = 0;
-        for (Hole hole :
-                holes){
-            this.holes[i++] = new Hole(hole.getId(), new int[] {hole.getColorSeeds(Color.R),hole.getColorSeeds(Color.B),hole.getColorSeeds(Color.TR)});
+        for (Hole hole : holes) {
+            this.holes[i++] = new Hole(hole.getId(), new int[]{hole.getColorSeeds(Color.R), hole.getColorSeeds(Color.B), hole.getColorSeeds(Color.TR)});
         }
     }
 
 
     private void capturing(int lastHoleId) {
-        if (opponentIsStarving()) {
-            score += sumSeeds();
-            return;
-        }
         for (int i = lastHoleId - 1; true; i--) {
-            int index = (i + holes.length) % holes.length;
+            int index = (i + NUMBER_OF_HOLES) % NUMBER_OF_HOLES;
             int score = holes[index].sumSeeds();
             if (score == 2 || score == 3) {
                 this.score += score;
                 holes[index].emptiesHole();
-            } else return;
+            } else break;
         }
+        if (opponentIsStarving()) score += sumSeeds();
     }
 
     /**
      * Verify if the opponent is starving.
+     *
      * @return true if the opponent is starving; false else.
      */
     public boolean opponentIsStarving() {

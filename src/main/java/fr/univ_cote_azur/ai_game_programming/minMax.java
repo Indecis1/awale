@@ -140,11 +140,11 @@ public class minMax {
 
     private static void legitPlays(int startIndex, ArrayList<Move> legitMove, Hole[] holes) {
         for (int i = startIndex; i < holes.length; i += 2) {
-            if (holes[i].hasColorSeeds(Color.R)) legitMove.add(new Move(i + 1, Color.R, holes));
-            if (holes[i].hasColorSeeds(Color.B)) legitMove.add(new Move(i + 1, Color.B, holes));
+            if (holes[i].hasColorSeeds(Color.R)) legitMove.add(new Move(i + 1, Color.R));
+            if (holes[i].hasColorSeeds(Color.B)) legitMove.add(new Move(i + 1, Color.B));
             if (holes[i].hasColorSeeds(Color.TB)) {
-                legitMove.add(new Move(i + 1, Color.TR, holes));
-                legitMove.add(new Move(i + 1, Color.TB, holes));
+                legitMove.add(new Move(i + 1, Color.TR));
+                legitMove.add(new Move(i + 1, Color.TB));
             }
         }
     }
