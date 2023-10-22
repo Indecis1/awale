@@ -1,19 +1,29 @@
 package fr.univ_cote_azur.ai_game_programming;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board implements Cloneable {
 
-    private int[] playerSeeds = new int[2];
-    private int[] redSeedBoard = new int[16];
-    private int[] blueSeedBoard = new int[16];
-    private int[] transparentSeedBoard = new int[16];
+    private int[] playerSeeds;
+    private int[] redSeedBoard;
+    private int[] blueSeedBoard;
+    private int[] transparentSeedBoard;
+
+    private List<IA.Move> moveHistory;
 
     public Board(){
+        playerSeeds = new int[2];
+        redSeedBoard = new int[16];
+        blueSeedBoard = new int[16];
+        transparentSeedBoard = new int[16];
         for(int i = 0; i<16; i++){
             redSeedBoard[i] = 2;
             blueSeedBoard[i] = 2;
             transparentSeedBoard[i] = 1;
         }
+        moveHistory = new ArrayList<>();
     }
 
     /**
@@ -64,6 +74,7 @@ public class Board implements Cloneable {
             case TRANSPARENT_RED -> lastHole = playRed(start, transparentSeedBoard);
             case TRANSPARENT_BLUE -> lastHole = playBlue(start, transparentSeedBoard);
         }
+        moveHistory.add(new IA.Move(start, color));
         playerSeeds[start % 2] += capture(lastHole);
         return checkVictory(player);
     }
@@ -191,6 +202,14 @@ public class Board implements Cloneable {
         this.transparentSeedBoard = transparentSeedBoard;
     }
 
+    public List<IA.Move> getMoveHistory() {
+        return moveHistory;
+    }
+
+    public void setMoveHistory(List<IA.Move> moveHistory) {
+        this.moveHistory = moveHistory;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -215,6 +234,7 @@ public class Board implements Cloneable {
             board.setBlueSeedBoard(blueSeedBoard);
             board.setRedSeedBoard(redSeedBoard);
             board.setTransparentSeedBoard(transparentSeedBoard);
+            board.setMoveHistory(moveHistory);
             return board;
         } catch (CloneNotSupportedException e) {
             return null;

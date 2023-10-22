@@ -1,9 +1,10 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-import fr.univ_cote_azur.ai_game_programming.Board;
-import fr.univ_cote_azur.ai_game_programming.Color;
 
 import java.util.ArrayList;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class IA {
 
@@ -18,16 +19,35 @@ public class IA {
     }
 
     public Move play(Board board){
-        ArrayList<MinimaxResult> result = minimax(board, -1, null, 0, isMaxPlayer);
+        ArrayList<MinimaxResult> result = minimax(board, -1, null, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, isMaxPlayer);
         MinimaxResult lastResult =  result.get(result.size() - 1);
         return new Move(lastResult.cell, lastResult.color);
     }
 
-    private ArrayList<MinimaxResult> minimax(Board board, int cell, Color color, int depth, boolean maxPlayer){
+    private int vulnerableCellMetric(Board board, boolean isMaxPlayer){
+        int vulnerableCell = 0;
+        int[] redSeedBoard = board.getRedSeedBoard(); ;
+        int[] blueSeedBoard = board.getBlueSeedBoard();
+        int[] transparentSeedBoard = board.getTransparentSeedBoard() ;
+        for (int i = getPlayer(isMaxPlayer); i<16; i=i+2){
+            if(redSeedBoard[i] == 1 || redSeedBoard[i] == 2 || blueSeedBoard[i] == 1 || blueSeedBoard[i] == 2 || transparentSeedBoard[i] == 1 || transparentSeedBoard[i] == 2)
+                vulnerableCell += 1;
+        }
+        return vulnerableCell;
+    }
+
+    private int heuristic(Board board, boolean isMaxPlayer){
+        int[] nextPlayers = {1, 0};
+        int player = getPlayer(isMaxPlayer);
+        return (2 * board.getPlayerSeeds()[player] + vulnerableCellMetric(board, isMaxPlayer)) - (2 * board.getPlayerSeeds()[nextPlayers[player]] + vulnerableCellMetric(board, !isMaxPlayer));
+    }
+
+    private ArrayList<MinimaxResult> minimax(Board board, int cell, Color color, int depth, int alpha, int beta, boolean maxPlayer){
         ArrayList<MinimaxResult> result;
-        if (depth == 5){
+        int score;
+        if (depth == 7){
             result = new ArrayList<>();
-            result.add(new MinimaxResult(board.getPlayerSeeds()[0], -1, null));
+            result.add(new MinimaxResult(heuristic(board, maxPlayer), -1, null));
             return result;
         }
         boolean couldPlay;
@@ -37,7 +57,6 @@ public class IA {
         ArrayList<MinimaxResult> bestResult = new ArrayList<>();
         Color bestMoveScoreColor = null;
         int bestMoveScoreCell = 0;
-        int score = -1;
         // maxPlayer is player 1
         if (maxPlayer){
             if (cell > -1)
@@ -52,9 +71,12 @@ public class IA {
                     }
                     if (!couldPlay)
                         continue;
-                    result = minimax(newBoard, i, c,depth + 1, false);
-                    score = result.get(0).score();
-                    if (result.get(0).score() > bestScore){
+                    result = minimax(newBoard, i, c,depth + 1, alpha, beta, false);
+                    score = result.get(result.size() - 1).score();
+                    if (score >= beta)
+                        break;
+                    alpha = max(alpha, score);
+                    if (result.get(result.size() - 1).score() > bestScore){
                         bestScore = score;
                         bestMoveScoreColor = c;
                         bestMoveScoreCell = i;
@@ -78,8 +100,11 @@ public class IA {
                     }
                     if (!couldPlay)
                         continue;
-                    result = minimax(newBoard, i, c,depth + 1, true);
-                    score = result.get(0).score();
+                    result = minimax(newBoard, i, c,depth + 1, alpha, beta, true);
+                    score = result.get(result.size() - 1).score();
+                    if (score <= alpha)
+                        break;
+                    beta = min(beta, score);
                     if (score < minScore){
                         minScore = score;
                         bestMoveScoreColor = c;
@@ -92,6 +117,13 @@ public class IA {
             bestMove.add(new MinimaxResult(minScore, bestMoveScoreCell, bestMoveScoreColor));
         }
         return bestMove;
+    }
+
+    public int getPlayer(boolean maxPlayer){
+        if (maxPlayer)
+            return 0;
+        else
+            return 1;
     }
 
     public record MinimaxResult(int score, int cell, Color color) {}
