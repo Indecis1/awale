@@ -12,8 +12,6 @@ public class Move {
     private Color color;
     private int scoreEvaluation;
 
-    private Hole[] holes;
-
     /**
      * First constructor of the class. This constructor is mainly used in {@link Game} to create a new Move when necessary.
      *

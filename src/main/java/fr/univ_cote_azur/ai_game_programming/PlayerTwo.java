@@ -142,7 +142,6 @@ public class PlayerTwo implements Player {
         } catch (IllegalArgumentException e) {
             System.out.print(e.getMessage());
             exit(0);
-            ;
         }
         int number_of_seeds = holes[id_firstHole - 1].getColorSeeds(color);
         holes[id_firstHole - 1].emptiesColorHole(color);
@@ -192,7 +191,7 @@ public class PlayerTwo implements Player {
     }
 
     /**
-     * Sets the state holes as they are after the play of the opponents..
+     * Sets the state holes as they are after the play of the opponents.
      *
      * @param holes the array of holes to set
      */
