@@ -171,7 +171,7 @@ public class PlayerTwo implements Player {
 
     private int sowingBlue(int id_firstHole, Color color, int number_of_seeds) {
         int index = 0;
-        for (int i = id_firstHole; number_of_seeds > 0; i++) {
+        for (int i = id_firstHole; number_of_seeds > 0; i+=2) {
             index = i % holes.length;
             if (index == id_firstHole - 1 || index % 2 == 1) continue;
             holes[index].incrementsColorSeeds(color);
