@@ -17,11 +17,14 @@ public class minMax {
      * @return the best {@link Move} to play for {@param player} at x-moment of the game.
      */
     public static Move decision(Player player) {
+        long start = System.nanoTime();
         boolean isMax = true;
-        int maxDepth = 2;
+        int maxDepth = 4;
         original_holes = new Stack<>();
         Move bestMove = new Move(0, null);
-        return decisionMinMax(player, bestMove, isMax, maxDepth);
+        bestMove = decisionMinMax(player, bestMove, isMax, maxDepth);
+        System.out.println("Duree :" + ((System.nanoTime() - start)/Math.pow(10, 9)) + "s.");
+        return bestMove;
     }
 
     /**
@@ -53,7 +56,7 @@ public class minMax {
 
         final int initial_score = parentMove.getScoreEvaluation();
 
-        for (Move move : legitMove) {
+        for (Move move : legitMove){
 
             Hole[] depth_holes = original_holes.peek().holes;
 
