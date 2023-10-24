@@ -49,7 +49,7 @@ public class Opponent extends Player {
             throw new IllegalArgumentException("Impossible play from Opponent... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
         else if (index_first_hole % 2 != turn)
             throw new IllegalArgumentException("Impossible play from Opponent... Number parity is incorrect :" + (index_first_hole % 2) + ".");
-        else if (Main.has_seedColor(board, index_first_hole, color))
+        else if (Main.has_seed_of_Color(board, index_first_hole, color))
             throw new IllegalArgumentException("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + "seeds.");
     }
 
@@ -91,36 +91,12 @@ public class Opponent extends Player {
             return sowingBlue(board, index_first_hole, color, seeds);
     }
 
-    private int sowingRed(int[][] board, int index_first_hole, Color color, int seeds){
-        int color_int = Color.to_int(color);
-        int index = 0;
-        for (int i = index_first_hole+2; seeds > 0 ; i++) {
-            index = i%16;
-            if(index == index_first_hole)
-                continue;
-            board[color_int][i]++;
-            seeds--;
-        }
-        return index;
-    }
 
-    private int sowingBlue(int[][] board, int index_first_hole, Color color, int seeds){
-        int color_int = Color.to_int(color);
-        int index = 0;
-        for (int i = index_first_hole+2; seeds > 0 ; i+= 2) {
-            index = i%16;
-            if(index == index_first_hole)
-                continue;
-            board[color_int][i]++;
-            seeds--;
-        }
-        return index;
-    }
 
     @Override
     public boolean otherPlayerIsStarving(int[][] board) {
         for (int i = (turn+1)%2; i < 16; i+=2) {
-            if(!Main.has_seedColor(board, i, Color.R) && !Main.has_seedColor(board, i, Color.R) && Main.has_seedColor(board, i, Color.TR))
+            if(!Main.has_seed_of_Color(board, i, Color.R) && !Main.has_seed_of_Color(board, i, Color.R) && Main.has_seed_of_Color(board, i, Color.TR))
                 return true;
         }
         return false;

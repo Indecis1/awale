@@ -20,6 +20,32 @@ public abstract class Player {
         return captured_seeds;
     }
 
+    protected int sowingRed(int[][] board, int index_first_hole, Color color, int seeds){
+        int color_int = Color.to_int(color);
+        int index = 0;
+        for (int i = index_first_hole+2; seeds > 0 ; i++) {
+            index = i%16;
+            if(index == index_first_hole)
+                continue;
+            board[color_int][i]++;
+            seeds--;
+        }
+        return index;
+    }
+
+    protected int sowingBlue(int[][] board, int index_first_hole, Color color, int seeds){
+        int color_int = Color.to_int(color);
+        int index = 0;
+        for (int i = index_first_hole+2; seeds > 0 ; i+= 2) {
+            index = i%16;
+            if(index == index_first_hole)
+                continue;
+            board[color_int][i]++;
+            seeds--;
+        }
+        return index;
+    }
+
     public abstract int getScore();
     abstract int sowing(int[][] board, int index, Color color);
     public abstract boolean otherPlayerIsStarving(int[][] board);

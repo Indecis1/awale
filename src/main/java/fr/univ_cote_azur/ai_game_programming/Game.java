@@ -8,13 +8,12 @@ import java.util.Scanner;
 
 public class Game {
     private final int[][] board;
+    private final Player[] playerOrder;
     private Opponent op;
     private IA ia;
-    private final Player[] playerOrder;
 
 
-
-    public Game(){
+    public Game() {
         board = new int[3][16];
         for (int j = 0; j < board.length; j++) {
             board[0][j] = 2;
@@ -29,45 +28,44 @@ public class Game {
 
     }
 
-    private void whoStart(){
+    private void whoStart() {
         Scanner sc = new Scanner(System.in);
-        ia = new IA();
         System.out.print("Do IA start ? [Y/N]");
-        if(sc.nextLine().equals("Y")){
+        if (sc.nextLine().equals("Y")) {
+            ia = new IA(0);
             playerOrder[0] = ia;
             op = new Opponent(1);
             playerOrder[1] = op;
-        }else {
+        } else {
             op = new Opponent(0);
             playerOrder[0] = op;
+            ia = new IA(1);
             playerOrder[1] = ia;
         }
     }
 
-    public void start(){
+    public void start() {
         boolean endGame = false;
         int turn = 0;
         Main.print_Board(board);
-        while (!endGame){
-            if(playerOrder[turn] instanceof Opponent)
-                op.play(board);
-            else
-                ia.play();
-
+        while (!endGame) {
+            if (playerOrder[turn] instanceof Opponent) op.play(board);
+            else ia.play(board);
             Main.print_Board(board);
             endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds() || playerOrder[turn].otherPlayerIsStarving(board);
-            turn = (turn+1)%2;
+            turn = (turn + 1) % 2;
         }
     }
 
-    private boolean playerHasMoreThen40seeds(){
+    private boolean playerHasMoreThen40seeds() {
         return playerOrder[0].getScore() > 41 || playerOrder[1].getScore() > 42;
     }
-    private boolean playersHave40seeds(){
+
+    private boolean playersHave40seeds() {
         return playerOrder[0].getScore() == 40 && playerOrder[1].getScore() == 40;
     }
 
-    private boolean notEnoughSeeds(){
+    private boolean notEnoughSeeds() {
         return Main.count_seeds(board) < 10;
     }
 }
