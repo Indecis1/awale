@@ -1,10 +1,12 @@
 package fr.univ_cote_azur.ai_game_programming;
 
+import fr.univ_cote_azur.ai_game_programming.Player.IA;
+import fr.univ_cote_azur.ai_game_programming.Player.Opponent;
+import fr.univ_cote_azur.ai_game_programming.Player.Player;
+
 import java.util.Scanner;
 
 public class Game {
-
-    private final Scanner sc;
     private final int[][] board;
     private final Opponent op;
     private final IA ia;
@@ -20,7 +22,7 @@ public class Game {
             board[2][j] = 1;
         }
 
-        sc = new Scanner(System.in);
+
 
         op = new Opponent();
         ia = new IA();
@@ -31,6 +33,7 @@ public class Game {
     }
 
     private void whoStart(){
+        Scanner sc = new Scanner(System.in);
         System.out.print("Do IA start ? [Y/N]");
         if(sc.nextLine().equals("Y")){
             playerOrder[0] = ia;
@@ -63,5 +66,4 @@ public class Game {
     private boolean notEnoughSeeds(){
         return Main.count_seeds(board) < 10;
     }
-
 }
