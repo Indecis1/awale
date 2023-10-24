@@ -13,18 +13,29 @@ public class minMax {
 
     /**
      * The recursive of our min-max algorithm starts here.
+     *
      * @param player the player for whom the best next move is computed.
      * @return the best {@link Move} to play for {@param player} at x-moment of the game.
      */
     public static Move decision(Player player) {
+        System.out.println("Legit moves :" + player.numberLegitMoves() );
         long start = System.nanoTime();
         boolean isMax = true;
-        int maxDepth = 4;
         original_holes = new Stack<>();
         Move bestMove = new Move(0, null);
+        int maxDepth = maxDepth(player.numberLegitMoves(), player.sumSeeds());
         bestMove = decisionMinMax(player, bestMove, isMax, maxDepth);
-        System.out.println("Duree :" + ((System.nanoTime() - start)/Math.pow(10, 9)) + "s.");
+        System.out.println("***Duree :" + ((System.nanoTime() - start) / Math.pow(10, 9)) + "s. Depth :" + maxDepth + ". Evaluation :" + bestMove.getScoreEvaluation() + ". Legit moves :" + player.numberLegitMoves() + "***" );
         return bestMove;
+    }
+
+    private static int maxDepth(int sizeLegitMove, int sumSeeds){
+        if (sizeLegitMove > 24)
+            return 3;
+        else if (sizeLegitMove > 10)
+            return 4;
+        else
+            return 5;
     }
 
     /**
@@ -49,20 +60,26 @@ public class minMax {
     private static Move decisionMinMax(Player player, Move parentMove, boolean isMax, int maxDepth) {
 
         original_holes.push(new Holes(player.getHoles().clone()));
+
         // Get all the legit move
         ArrayList<Move> legitMove = new ArrayList<>();
         createListeOfLegitMove(player, legitMove, original_holes.peek().holes);
+        if (legitMove.isEmpty()) return parentMove;
 
+        Move bestMove = legitMove.get(0);
 
         final int initial_score = parentMove.getScoreEvaluation();
 
-        for (Move move : legitMove){
+        for (Move move : legitMove) {
+
+            //if (alpha_beta(isMax, parentMove.getScoreEvaluation(), bestMove.getScoreEvaluation())) break;
 
             Hole[] depth_holes = original_holes.peek().holes;
 
             // Resetting the holes and the score.
             player.setHoles(depth_holes.clone());
             player.resetScore(initial_score);
+            move.setScoreEvaluation(initial_score);
 
 
             // Simulate the legit move and adjust the estimated score after the move
@@ -72,19 +89,49 @@ public class minMax {
             adjust_evaluationScore(move, after_score - initial_score, isMax);
 
 
-            // Create the opponent player
-            Player opponent = setOpponent(player);
-            opponent.setHoles(player.getHoles());
+            if (maxDepth - 1 >= 0){
+                // Create the opponent player
+                Player opponent = setOpponent(player);
+                opponent.setHoles(player.getHoles());
+                Move bestChild = decisionMinMax(opponent, move, !isMax, maxDepth - 1);
+                move.setScoreEvaluation(bestChild.getScoreEvaluation());
+            }
 
-            if (maxDepth - 1 > 0)
-                move.setScoreEvaluation(decisionMinMax(opponent, move, !isMax, maxDepth - 1).getScoreEvaluation());
-
+            if (move == legitMove.get(0)) {
+                bestMove = move;
+                parentMove.setScoreEvaluation(bestMove.getScoreEvaluation());
+            } else if (isMinMax(move.getScoreEvaluation(), parentMove.getScoreEvaluation(), isMax)) {
+                bestMove = move;
+                parentMove.setScoreEvaluation(bestMove.getScoreEvaluation());
+            }
         }
 
         original_holes.pop();
         player.resetScore(initial_score);
-        if (legitMove.isEmpty()) return parentMove;
-        return selectMinMax(legitMove, isMax);
+        return bestMove;
+    }
+
+    /**
+     * Alpha beta algorithm. Explication :
+     * isMax == true (resp. false) for the parent :
+     * When a node is evaluated at x and his parent is evaluated at y, if x < y (resp. x > y) then there is no need to compute the score
+     * of the other move because we will only choose moves with a smaller (resp. greater) score (isMax == false (resp. true) for the child)...
+     * and this one is smaller (resp. greater) than the parent's evaluated score.
+     * Therefore, we can "cut" this part of the tree and save time and ressources.
+     *
+     * @param isMax       boolean value to determine in which state of min-max we are.
+     * @param scoreParent parent's move's evaluated score
+     * @param scoreMove   actual move's evaluated score
+     * @return true if we can do an alpha beta cut; false otherwise.
+     */
+    private static boolean alpha_beta(boolean isMax, int scoreParent, int scoreMove) {
+        if (isMax) return scoreMove < scoreParent;
+        return scoreMove > scoreParent;
+    }
+
+    private static boolean isMinMax(int scoreMove, int scoreParent, boolean isMax) {
+        if (isMax) return scoreMove > scoreParent;
+        else return scoreMove < scoreParent;
     }
 
     private static void adjust_evaluationScore(Move move, int score, boolean isMax) {
@@ -92,41 +139,41 @@ public class minMax {
         else move.minusEvaluationScore(score);
     }
 
-    private static Move selectMinMax(ArrayList<Move> legitMove, boolean isMax) {
-        if (isMax) {
-            return findMax(legitMove);
-        } else {
-            return findMin(legitMove);
-        }
-    }
-
-    private static Move findMax(ArrayList<Move> legitMove) {
-        Move max = legitMove.get(0);
-
-        for (int i = 1; i < legitMove.size(); i++) {
-            Move currentMove = legitMove.get(i);
-
-            if (currentMove.getScoreEvaluation() > max.getScoreEvaluation()) {
-                max = currentMove;
-            }
-        }
-
-        return max;
-    }
-
-    private static Move findMin(ArrayList<Move> legitMove) {
-        Move min = legitMove.get(0);
-
-        for (int i = 1; i < legitMove.size(); i++) {
-            Move currentMove = legitMove.get(i);
-
-            if (currentMove.getScoreEvaluation() < min.getScoreEvaluation()) {
-                min = currentMove;
-            }
-        }
-
-        return min;
-    }
+//    private static Move selectMinMax(ArrayList<Move> legitMove, boolean isMax) {
+//        if (isMax) {
+//            return findMax(legitMove);
+//        } else {
+//            return findMin(legitMove);
+//        }
+//    }
+//
+//    private static Move findMax(ArrayList<Move> legitMove) {
+//        Move max = legitMove.get(0);
+//
+//        for (int i = 1; i < legitMove.size(); i++) {
+//            Move currentMove = legitMove.get(i);
+//
+//            if (currentMove.getScoreEvaluation() > max.getScoreEvaluation()) {
+//                max = currentMove;
+//            }
+//        }
+//
+//        return max;
+//    }
+//
+//    private static Move findMin(ArrayList<Move> legitMove) {
+//        Move min = legitMove.get(0);
+//
+//        for (int i = 1; i < legitMove.size(); i++) {
+//            Move currentMove = legitMove.get(i);
+//
+//            if (currentMove.getScoreEvaluation() < min.getScoreEvaluation()) {
+//                min = currentMove;
+//            }
+//        }
+//
+//        return min;
+//    }
 
 
     private static Player setOpponent(Player p) {

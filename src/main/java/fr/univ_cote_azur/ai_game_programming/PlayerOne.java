@@ -174,7 +174,7 @@ public class PlayerOne implements Player {
 
     private int sowingBlue(int id_firstHole, Color color, int number_of_seeds) {
         int index = 0;
-        for (int i = id_firstHole; number_of_seeds > 0; i+=2) {
+        for (int i = id_firstHole; number_of_seeds > 0; i += 2) {
             index = i % NUMBER_OF_HOLES;
             if (index == id_firstHole - 1) continue;
             holes[index].incrementsColorSeeds(color);
@@ -252,7 +252,12 @@ public class PlayerOne implements Player {
         return score;
     }
 
-    private int sumSeeds() {
+    /**
+     * Compute the number of seeds on the board.
+     *
+     * @return the number of seeds on the board.
+     */
+    public int sumSeeds() {
         int score = 0;
         for (int i = 0; i < NUMBER_OF_HOLES; i++) {
             score += holes[i].sumSeeds();
@@ -260,5 +265,20 @@ public class PlayerOne implements Player {
         return score;
     }
 
-
+    /**
+     * Compute the number of legit moves.
+     *
+     * @return the number of legit moves.
+     */
+    @Override
+    public int numberLegitMoves() {
+        int legitMoves = 0;
+        for (Hole hole : holes) {
+            if(hole.isEven()) continue;
+            if (hole.hasColorSeeds(Color.R)) legitMoves++;
+            if (hole.hasColorSeeds(Color.B)) legitMoves++;
+            if (hole.hasColorSeeds(Color.TR)) legitMoves += 2;
+        }
+        return legitMoves;
+    }
 }

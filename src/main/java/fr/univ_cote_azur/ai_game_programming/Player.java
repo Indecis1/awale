@@ -59,4 +59,18 @@ public interface Player {
      */
     public void resetScore(int resetScore);
 
+    /**
+     * Compute the number of seeds on the board.
+     *
+     * @return the number of seeds on the board.
+     */
+    public int sumSeeds();
+
+    /**
+     * Compute the number of legit moves.
+     *
+     * @return the number of legit moves.
+     */
+    public int numberLegitMoves();
+
 }
