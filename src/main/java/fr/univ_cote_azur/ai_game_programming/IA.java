@@ -1,4 +1,4 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-public class IA {
+public class IA extends Player{
 }
