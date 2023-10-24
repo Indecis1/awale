@@ -1,7 +1,9 @@
 package fr.univ_cote_azur.ai_game_programming;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * This class is the heart of our AI. This is our algorithm to determine the best move to play at the x-moment of
@@ -10,6 +12,8 @@ import java.util.Stack;
 public class minMax {
 
     private static Stack<Holes> original_holes;
+    private static int alpha = -100;
+    private static int beta = 100;
 
     /**
      * The recursive of our min-max algorithm starts here.
@@ -18,18 +22,18 @@ public class minMax {
      * @return the best {@link Move} to play for {@param player} at x-moment of the game.
      */
     public static Move decision(Player player) {
-        System.out.println("Legit moves :" + player.numberLegitMoves() );
         long start = System.nanoTime();
         boolean isMax = true;
         original_holes = new Stack<>();
         Move bestMove = new Move(0, null);
-        int maxDepth = maxDepth(player.numberLegitMoves(), player.sumSeeds());
+        int maxDepth = maxDepth(player.numberLegitMoves());
+        System.out.println("Legit moves :" + player.numberLegitMoves() + ". Depth :" + maxDepth + "." );
         bestMove = decisionMinMax(player, bestMove, isMax, maxDepth);
-        System.out.println("***Duree :" + ((System.nanoTime() - start) / Math.pow(10, 9)) + "s. Depth :" + maxDepth + ". Evaluation :" + bestMove.getScoreEvaluation() + ". Legit moves :" + player.numberLegitMoves() + "***" );
+        System.out.println("***Duree :" + ((System.nanoTime() - start) / Math.pow(10, 9)) + "s. Evaluation :" + bestMove.getScoreEvaluation() + ". Legit moves :" + player.numberLegitMoves() + "***" );
         return bestMove;
     }
 
-    private static int maxDepth(int sizeLegitMove, int sumSeeds){
+    private static int maxDepth(int sizeLegitMove){
         if (sizeLegitMove > 24)
             return 3;
         else if (sizeLegitMove > 10)
@@ -104,10 +108,26 @@ public class minMax {
                 bestMove = move;
                 parentMove.setScoreEvaluation(bestMove.getScoreEvaluation());
             }
+
+
+
+
+
         }
 
         original_holes.pop();
         player.resetScore(initial_score);
+
+
+        // Si par hasard, il nous retourne un mouvement interdit. On recupere un moov au hasard.
+        if(!legitMove.contains(bestMove)){
+            System.out.print("***au hasard...***");
+            Collections.shuffle(legitMove);
+
+            // Récupérez le premier élément (élément aléatoire)
+            bestMove = legitMove.get(0);
+        }
+
         return bestMove;
     }
 
@@ -124,9 +144,9 @@ public class minMax {
      * @param scoreMove   actual move's evaluated score
      * @return true if we can do an alpha beta cut; false otherwise.
      */
-    private static boolean alpha_beta(boolean isMax, int scoreParent, int scoreMove) {
-        if (isMax) return scoreMove < scoreParent;
-        return scoreMove > scoreParent;
+    private static boolean alpha_beta(boolean isMax, int evaluation) {
+
+        return true;
     }
 
     private static boolean isMinMax(int scoreMove, int scoreParent, boolean isMax) {
@@ -138,43 +158,6 @@ public class minMax {
         if (isMax) move.addEvaluationScore(score);
         else move.minusEvaluationScore(score);
     }
-
-//    private static Move selectMinMax(ArrayList<Move> legitMove, boolean isMax) {
-//        if (isMax) {
-//            return findMax(legitMove);
-//        } else {
-//            return findMin(legitMove);
-//        }
-//    }
-//
-//    private static Move findMax(ArrayList<Move> legitMove) {
-//        Move max = legitMove.get(0);
-//
-//        for (int i = 1; i < legitMove.size(); i++) {
-//            Move currentMove = legitMove.get(i);
-//
-//            if (currentMove.getScoreEvaluation() > max.getScoreEvaluation()) {
-//                max = currentMove;
-//            }
-//        }
-//
-//        return max;
-//    }
-//
-//    private static Move findMin(ArrayList<Move> legitMove) {
-//        Move min = legitMove.get(0);
-//
-//        for (int i = 1; i < legitMove.size(); i++) {
-//            Move currentMove = legitMove.get(i);
-//
-//            if (currentMove.getScoreEvaluation() < min.getScoreEvaluation()) {
-//                min = currentMove;
-//            }
-//        }
-//
-//        return min;
-//    }
-
 
     private static Player setOpponent(Player p) {
         Player opponent;

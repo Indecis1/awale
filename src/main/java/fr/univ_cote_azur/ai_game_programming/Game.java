@@ -68,11 +68,11 @@ public class Game {
 
             /**     Player 1 -- AI     **/
             int score_actual = ia.getScore();
-            ia.setHoles(holes.clone());
+            ia.setHoles(holes);
             Move bestMove = minMax.decision(ia);
             System.out.println("Move min max : " + bestMove.getIdHole() + bestMove.getColor());
             ia.resetScore(score_actual);
-            ia.setHoles(holes.clone());
+//            ia.setHoles(holes.clone());
             ia.nextPlay(bestMove);
             holes = ia.getHoles().clone();
             printBoard();
