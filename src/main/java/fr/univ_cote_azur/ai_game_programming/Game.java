@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class Game {
     private final int[][] board;
-    private final Opponent op;
-    private final IA ia;
+    private Opponent op;
+    private IA ia;
     private final Player[] playerOrder;
 
 
@@ -23,9 +23,6 @@ public class Game {
         }
 
 
-
-        op = new Opponent();
-        ia = new IA();
         playerOrder = new Player[2];
         whoStart();
 
@@ -34,11 +31,14 @@ public class Game {
 
     private void whoStart(){
         Scanner sc = new Scanner(System.in);
+        ia = new IA();
         System.out.print("Do IA start ? [Y/N]");
         if(sc.nextLine().equals("Y")){
             playerOrder[0] = ia;
+            op = new Opponent(1);
             playerOrder[1] = op;
         }else {
+            op = new Opponent(0);
             playerOrder[0] = op;
             playerOrder[1] = ia;
         }
@@ -47,11 +47,15 @@ public class Game {
     public void start(){
         boolean endGame = false;
         int turn = 0;
+        Main.print_Board(board);
         while (!endGame){
+            if(playerOrder[turn] instanceof Opponent)
+                op.play(board);
+            else
+                ia.play();
 
-
-
-            endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds() || playerOrder[turn].otherPlayerIsStarving();
+            Main.print_Board(board);
+            endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds() || playerOrder[turn].otherPlayerIsStarving(board);
             turn = (turn+1)%2;
         }
     }

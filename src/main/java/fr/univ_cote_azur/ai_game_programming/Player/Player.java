@@ -4,7 +4,6 @@ import fr.univ_cote_azur.ai_game_programming.Color;
 import fr.univ_cote_azur.ai_game_programming.Main;
 
 public abstract class Player {
-    private int score;
 
     public Player(){
 
@@ -21,15 +20,8 @@ public abstract class Player {
         return captured_seeds;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    abstract void sowing(int[][] board, int index, Color color);
-    public abstract boolean otherPlayerIsStarving();
+    public abstract int getScore();
+    abstract int sowing(int[][] board, int index, Color color);
+    public abstract boolean otherPlayerIsStarving(int[][] board);
 
 }
