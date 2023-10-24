@@ -10,6 +10,7 @@ public enum Color {
         else if (color == B) return 1;
         else return 2;
     }
+
     public static Color getRandomColor() {
         Color[] colors = {R, B, TR, TB};
         return colors[new Random().nextInt(colors.length)];

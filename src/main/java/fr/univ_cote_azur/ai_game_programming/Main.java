@@ -1,13 +1,16 @@
 package fr.univ_cote_azur.ai_game_programming;
 
+import fr.univ_cote_azur.ai_game_programming.Player.Player;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Game game = new Game();
+        game.start();
     }
 
     public static int count_seeds(int[][] board) {
         int count_seeds_val = 0;
-        for (int j = 0; j < board.length; j++) {
+        for (int j = 0; j < 16; j++) {
             count_seeds_val += board[0][j] + board[1][j] + board[2][j];
         }
         return count_seeds_val;
@@ -18,7 +21,7 @@ public class Main {
     }
 
     public static void emptyBoard(int[][] board) {
-        for (int j = 0; j < board.length; j++) {
+        for (int j = 0; j < 16; j++) {
             board[0][j] = 0;
             board[1][j] = 0;
             board[2][j] = 0;
@@ -40,14 +43,30 @@ public class Main {
     }
 
     public static void print_Board(int[][] board) {
+        System.out.println();
         for (int j = 0; j < 8; j++) {
-            System.out.print((j + 1) + "(R" + board[0][j] + ",B" + board[1][j] + ",T" + board[2][j] + ") -- ");
+            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
         }
         System.out.println();
         for (int j = 15; j >= 8; j--) {
-            System.out.print((j + 1) + "(R" + board[0][j] + ",B" + board[1][j] + ",T" + board[2][j] + ") -- ");
+            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
         }
-        System.out.println("-".repeat(90));
+        System.out.println("\n" + "-".repeat(90));
+    }
+
+    public static void print_Board(int[][] board, Player[] players) {
+        System.out.println();
+        for (int j = 0; j < 8; j++) {
+            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
+        }
+        System.out.println();
+        for (int j = 15; j >= 8; j--) {
+            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
+        }
+        System.out.println("\n\n");
+        players[0].printScore();
+        players[1].printScore();
+        System.out.println("\n" + "-".repeat(90));
     }
 
     public static boolean has_seed_of_Color(int[][] board, int index, Color color) {

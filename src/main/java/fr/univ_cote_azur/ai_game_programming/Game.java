@@ -15,16 +15,14 @@ public class Game {
 
     public Game() {
         board = new int[3][16];
-        for (int j = 0; j < board.length; j++) {
+        for (int j = 0; j < 16; j++) {
             board[0][j] = 2;
             board[1][j] = 2;
             board[2][j] = 1;
         }
 
-
         playerOrder = new Player[2];
         whoStart();
-
 
     }
 
@@ -51,10 +49,24 @@ public class Game {
         while (!endGame) {
             if (playerOrder[turn] instanceof Opponent) op.play(board);
             else ia.play(board);
-            Main.print_Board(board);
-            endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds() || playerOrder[turn].otherPlayerIsStarving(board);
+            Main.print_Board(board, playerOrder);
+            System.out.println(playerHasMoreThen40seeds() + "-" + playersHave40seeds() + "-" + notEnoughSeeds());
+            endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds();
             turn = (turn + 1) % 2;
         }
+        printWinner();
+    }
+
+    private void printWinner() {
+        if (playerOrder[0] instanceof IA && playerOrder[0].getScore() > playerOrder[1].getScore())
+            System.out.println("IA is the winner.");
+        else if (playerOrder[0].getScore() == playerOrder[1].getScore()) System.out.println("It is a draw.");
+        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() > playerOrder[1].getScore())
+            System.out.println("Opponent is the winner.");
+        else if (playerOrder[0] instanceof IA && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("Opponent is the winner.");
+        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("IA is the winner.");
     }
 
     private boolean playerHasMoreThen40seeds() {

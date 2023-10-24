@@ -5,6 +5,8 @@ import fr.univ_cote_azur.ai_game_programming.Main;
 
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 public class Opponent extends Player {
 
     private final int turn;
@@ -12,7 +14,7 @@ public class Opponent extends Player {
 
     public Opponent(int turn) {
         this.turn = turn;
-        this.score=0;
+        this.score = 0;
     }
 
     public void play(int[][] board) {
@@ -23,18 +25,21 @@ public class Opponent extends Player {
             legitPlay(board, index_first_hole, color);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+            exit(0);
         }
+
+        System.out.println("Opponent play is :" + (index_first_hole + 1) + color);
 
         int last_index = sowing(board, index_first_hole, color);
         int seed_captured = capturing(board, last_index);
         add_to_score(seed_captured);
 
-        if(otherPlayerIsStarving(board)){
+        if (otherPlayerIsStarving(board)) {
+            System.out.println("IA IS STARVING");
             seed_captured = Main.count_seeds(board);
             add_to_score(seed_captured);
             Main.emptyBoard(board);
         }
-
     }
 
     private String askPlay() {
@@ -48,9 +53,9 @@ public class Opponent extends Player {
         if (!possibleNumber || !possibleColor)
             throw new IllegalArgumentException("Impossible play from Opponent... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
         else if (index_first_hole % 2 != turn)
-            throw new IllegalArgumentException("Impossible play from Opponent... Number parity is incorrect :" + (index_first_hole % 2) + ".");
-        else if (Main.has_seed_of_Color(board, index_first_hole, color))
-            throw new IllegalArgumentException("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + "seeds.");
+            throw new IllegalArgumentException("Impossible play from Opponent... Number parity is incorrect.");
+        else if (!Main.has_seed_of_Color(board, index_first_hole, color))
+            throw new IllegalArgumentException("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + " seeds.");
     }
 
     private Color setSeedColor(String asked_play) {
@@ -85,23 +90,29 @@ public class Opponent extends Player {
     int sowing(int[][] board, int index_first_hole, Color color) {
         int seeds = Main.get_seedColor(board, index_first_hole, color);
         Main.emptySeedColor_at_index(board, index_first_hole, color);
-        if(color == Color.R || color == Color.TR)
-            return sowingRed(board, index_first_hole, color, seeds);
-        else
-            return sowingBlue(board, index_first_hole, color, seeds);
+        if (color == Color.R || color == Color.TR) return sowingRed(board, index_first_hole, color, seeds);
+        else return sowingBlue(board, index_first_hole, color, seeds);
     }
-
 
 
     @Override
     public boolean otherPlayerIsStarving(int[][] board) {
-        for (int i = (turn+1)%2; i < 16; i+=2) {
-            if(!Main.has_seed_of_Color(board, i, Color.R) && !Main.has_seed_of_Color(board, i, Color.R) && Main.has_seed_of_Color(board, i, Color.TR))
+        int start;
+        if (turn == 0) start = 1;
+        else start = 0;
+        for (int i = start; i < 16; i += 2) {
+            if (!Main.has_seed_of_Color(board, i, Color.R) && !Main.has_seed_of_Color(board, i, Color.B) && Main.has_seed_of_Color(board, i, Color.TR))
                 return true;
         }
         return false;
     }
-    private void add_to_score(int seedCaptured){
+
+    @Override
+    public void printScore() {
+        System.out.println("Opponent score :" + getScore());
+    }
+
+    private void add_to_score(int seedCaptured) {
         score += seedCaptured;
     }
 
