@@ -5,21 +5,21 @@ import fr.univ_cote_azur.ai_game_programming.Main;
 
 import java.util.Random;
 
-public class IA extends Player {
+public class Random_IA extends Player {
 
     private final int turn;
     private int score;
 
-    public IA(int turn) {
+    public Random_IA(int turn) {
         this.turn = turn;
         this.score = 0;
     }
 
     public void play(int[][] board) {
-        int index_first_hole;
-        Color color;
+        int index_first_hole = randomIndex(board);
+        Color color = randomColor(board, index_first_hole);
 
-        System.out.println("AI play is :" + (index_first_hole + 1) + color);
+        System.out.println("Random IA play is :" + (index_first_hole + 1) + color);
 
         int last_index = sowing(board, index_first_hole, color);
         int seed_captured = capturing(board, last_index);
@@ -32,7 +32,18 @@ public class IA extends Player {
         }
     }
 
-    // TODO : Implementer algorithm Min-Max
+    private int randomIndex(int[][] board) {
+        int random_index = new Random().nextInt(16);
+        while (random_index % 2 != turn || Main.count_seeds_at_index(board, random_index) == 0)
+            random_index = new Random().nextInt(16);
+        return random_index;
+    }
+
+    private Color randomColor(int[][] board, int index_first_hole) {
+        Color random_color = Color.getRandomColor();
+        while (!Main.has_seed_of_Color(board, index_first_hole, random_color)) random_color = Color.getRandomColor();
+        return random_color;
+    }
 
     @Override
     public int getScore() {
@@ -61,7 +72,7 @@ public class IA extends Player {
 
     @Override
     public void printScore() {
-        System.out.println("IA score :" + getScore());
+        System.out.println("Random_IA score :" + getScore());
     }
 
     private void add_to_score(int seedCaptured) {
