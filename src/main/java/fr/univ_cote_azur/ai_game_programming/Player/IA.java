@@ -20,7 +20,7 @@ public class IA extends Player {
         this.score = 0;
         this.parent_boards = new Stack<>();
         this.bestMove = new Move(0, null);
-        this.maxDepth = 1;
+        this.maxDepth = 4;
         this.eval_Global = 0;
     }
 
@@ -28,11 +28,13 @@ public class IA extends Player {
     public void play(int[][] board) {
         this.eval_Global = 0;
         boolean isMax = true;
+        long time_start = System.nanoTime();
         int eval = minMax(board, turn, isMax, maxDepth);
+        long time_end = System.nanoTime();
         int index_first_hole = bestMove.indexPlay;
         Color color = bestMove.color;
 
-        System.out.println("AI play is : **" + (index_first_hole + 1) + color + "**. Evaluation for a " + maxDepth + " depth is :" + eval);
+        System.out.println("AI play is : **" + (index_first_hole + 1) + color + "**. Evaluation for a " + maxDepth + " depth is :" + eval + " in " + (time_end - time_start) / Math.pow(10, 9) + "s.");
 
         int last_index = sowing(board, index_first_hole, color);
         int seed_captured = capturing(board, last_index);
@@ -45,7 +47,6 @@ public class IA extends Player {
         }
     }
 
-    // TODO : Implementer algorithm Min-Max
     private int minMax(int[][] board, int turn, boolean isMax, int depth) {
         if (depth == -1) {
             return eval_Global;
@@ -73,15 +74,9 @@ public class IA extends Player {
         parent_boards.push(board);
         Simulate_Player player = new Simulate_Player(turn);
 
-
         for (Move move : legitMoves) {
             int[][] local_board = new int[3][16];
             BoardOperations.deepCopy(parent_boards.peek(), local_board);
-//            System.out.print(" Depth :" + depth +" Move : " + (move.indexPlay + 1) + move.color + ". -- ");
-//            for (int j = 0; j < 16; j++) {
-//                System.out.print((j + 1) + "(" + local_board[0][j] + "R," + local_board[1][j] + "B," + local_board[2][j] + "T)   ");
-//            }
-//            System.out.println();
 
             eval_Global = save_eval;
 
@@ -102,12 +97,22 @@ public class IA extends Player {
                 local_eval = score;
             }
 
-
-            //TODO : implement alpha beta here.
+            if (isMax && coupe_alpha(save_eval, local_eval))
+                break;
+            else if (!isMax && coupe_Beta(save_eval, local_eval))
+                break;
 
         }
         parent_boards.pop();
         return local_eval;
+    }
+
+    private boolean coupe_Beta(int val_parent, int val_fils) {
+        return val_fils < val_parent;
+    }
+
+    private boolean coupe_alpha(int val_parent, int val_fils) {
+        return val_fils > val_parent;
     }
 
     @Override
