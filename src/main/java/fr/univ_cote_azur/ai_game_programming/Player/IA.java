@@ -9,9 +9,9 @@ import java.util.Stack;
 public class IA extends Player {
 
     private final int turn;
-    private final int maxDepth;
     private final Stack<int[][]> parent_boards;
     private int score;
+    private int maxDepth;
     private Move bestMove;
     private int eval_Global;
 
@@ -20,12 +20,13 @@ public class IA extends Player {
         this.score = 0;
         this.parent_boards = new Stack<>();
         this.bestMove = new Move(0, null);
-        this.maxDepth = 4;
         this.eval_Global = 0;
+        this.maxDepth = 0;
     }
 
     @Override
     public void play(int[][] board) {
+        this.maxDepth = setMaxDepth(board);
         this.eval_Global = 0;
         boolean isMax = true;
         long time_start = System.nanoTime();
@@ -46,6 +47,14 @@ public class IA extends Player {
             BoardOperations.emptyBoard(board);
         }
     }
+    private int setMaxDepth(int[][] board){
+        if (BoardOperations.count_seeds(board) > 74)
+            return 4;
+        else if (BoardOperations.count_seeds(board) > 50) {
+            return 5;
+        } else
+            return 4;
+    }
 
     private int minMax(int[][] board, int turn, boolean isMax, int depth) {
         if (depth == -1) {
@@ -62,10 +71,8 @@ public class IA extends Player {
 
         ArrayList<Move> legitMoves = BoardOperations.setLegitMoves(board, turn);
         if (legitMoves.isEmpty() && isMax) {
-            parent_boards.pop();
             return -100;
         } else if (legitMoves.isEmpty()) {
-            parent_boards.pop();
             return 100;
         }
         if (depth == maxDepth) bestMove = new Move(legitMoves.get(0).indexPlay, legitMoves.get(0).color);
