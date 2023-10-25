@@ -45,16 +45,23 @@ public class Game {
     public void start() {
         boolean endGame = false;
         int turn = 0;
-        Main.print_Board(board);
+        BoardOperations.print_Board(board);
         while (!endGame) {
             if (playerOrder[turn] instanceof Opponent) op.play(board);
             else ia.play(board);
-            Main.print_Board(board, playerOrder);
-            System.out.println(playerHasMoreThen40seeds() + "-" + playersHave40seeds() + "-" + notEnoughSeeds());
+            BoardOperations.print_Board(board, playerOrder);
+            printEndGamesCondition();
             endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds();
             turn = (turn + 1) % 2;
         }
         printWinner();
+    }
+
+    private void printEndGamesCondition() {
+        System.out.print("One player has more then 40 seeds :" + playerHasMoreThen40seeds() +
+                ". Both player have 40 seeds :" + playersHave40seeds() +
+                ". It remains less then 10 seeds :" + notEnoughSeeds());
+        System.out.println("\n" + "-".repeat(90));
     }
 
     private void printWinner() {
@@ -78,6 +85,6 @@ public class Game {
     }
 
     private boolean notEnoughSeeds() {
-        return Main.count_seeds(board) < 10;
+        return BoardOperations.count_seeds(board) < 10;
     }
 }

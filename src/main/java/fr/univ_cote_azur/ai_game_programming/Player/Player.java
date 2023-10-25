@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
+import fr.univ_cote_azur.ai_game_programming.BoardOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
-import fr.univ_cote_azur.ai_game_programming.Main;
 
 public abstract class Player {
 
@@ -13,10 +13,10 @@ public abstract class Player {
         int captured_seeds = 0;
         for (int i = lastIndex; true; i--) {
             int index = (i + 16) % 16;
-            int score = Main.count_seeds_at_index(board, index);
+            int score = BoardOperations.count_seeds_at_index(board, index);
             if (!(score == 2 || score == 3)) break;
             captured_seeds += score;
-            Main.emptyBoard_at_index(board, index);
+            BoardOperations.emptyBoard_at_index(board, index);
         }
         return captured_seeds;
     }
@@ -46,6 +46,8 @@ public abstract class Player {
     }
 
     public abstract int getScore();
+
+    abstract void play(int[][] board);
 
     abstract int sowing(int[][] board, int index, Color color);
 
