@@ -65,10 +65,10 @@ public class Random_IA extends Player {
         if (turn == 0) start = 1;
         else start = 0;
         for (int i = start; i < 16; i += 2) {
-            if (!BoardOperations.has_seed_of_Color(board, i, Color.R) && !BoardOperations.has_seed_of_Color(board, i, Color.B) && BoardOperations.has_seed_of_Color(board, i, Color.TR))
-                return true;
+            if (BoardOperations.has_seed_of_Color(board, i, Color.R) || BoardOperations.has_seed_of_Color(board, i, Color.B) || BoardOperations.has_seed_of_Color(board, i, Color.TR))
+                return false;
         }
-        return false;
+        return true;
     }
 
     @Override

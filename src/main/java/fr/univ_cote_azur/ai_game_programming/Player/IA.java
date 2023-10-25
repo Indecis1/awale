@@ -10,9 +10,10 @@ public class IA extends Player {
 
     private final int turn;
     private final int maxDepth;
-    private int score;
     private final Stack<int[][]> parent_boards;
+    private int score;
     private Move bestMove;
+    private int eval_Global;
 
     public IA(int turn) {
         this.turn = turn;
@@ -20,11 +21,14 @@ public class IA extends Player {
         this.parent_boards = new Stack<>();
         this.bestMove = new Move(0, null);
         this.maxDepth = 1;
+        this.eval_Global = 0;
     }
 
     @Override
     public void play(int[][] board) {
-        int eval = minMax(board, 0, turn, true, maxDepth);
+        this.eval_Global = 0;
+        boolean isMax = true;
+        int eval = minMax(board, turn, isMax, maxDepth);
         int index_first_hole = bestMove.indexPlay;
         Color color = bestMove.color;
 
@@ -42,60 +46,68 @@ public class IA extends Player {
     }
 
     // TODO : Implementer algorithm Min-Max
-    private int minMax(int[][] board, int eval, int turn, boolean isMax, int depth) {
-        int local_eval = eval;
-        parent_boards.push(board);
-
-
-        Simulate_Player player = new Simulate_Player(turn);
-
+    private int minMax(int[][] board, int turn, boolean isMax, int depth) {
         if (depth == -1) {
-            parent_boards.pop();
-            return local_eval;
+            return eval_Global;
         }
+
+        int save_eval = eval_Global;
+
+        int local_eval;
+        if (isMax)
+            local_eval = -100;
+        else
+            local_eval = 100;
 
         ArrayList<Move> legitMoves = BoardOperations.setLegitMoves(board, turn);
-        if (legitMoves.isEmpty()) {
-            return local_eval;
+        if (legitMoves.isEmpty() && isMax) {
+            parent_boards.pop();
+            return -100;
+        } else if (legitMoves.isEmpty()) {
+            parent_boards.pop();
+            return 100;
         }
-        if(depth == maxDepth)
-            bestMove = new Move(legitMoves.get(0).indexPlay, legitMoves.get(0).color);
+        if (depth == maxDepth) bestMove = new Move(legitMoves.get(0).indexPlay, legitMoves.get(0).color);
 
-        for (Move move :
-                legitMoves) {
+
+        parent_boards.push(board);
+        Simulate_Player player = new Simulate_Player(turn);
+
+
+        for (Move move : legitMoves) {
             int[][] local_board = new int[3][16];
             BoardOperations.deepCopy(parent_boards.peek(), local_board);
-//            System.out.print("Depth : " + depth + ". Move : " + (move.indexPlay+1) + move.color + ". -- ");
+//            System.out.print(" Depth :" + depth +" Move : " + (move.indexPlay + 1) + move.color + ". -- ");
 //            for (int j = 0; j < 16; j++) {
-//                System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
+//                System.out.print((j + 1) + "(" + local_board[0][j] + "R," + local_board[1][j] + "B," + local_board[2][j] + "T)   ");
 //            }
 //            System.out.println();
+
+            eval_Global = save_eval;
 
             player.simulate_play(local_board, move);
             int captured_seeds = player.getScore();
 
-            if (isMax)
-                local_eval += captured_seeds;
-            else
-                local_eval -= captured_seeds;
+            if (isMax) eval_Global += captured_seeds;
+            else eval_Global -= captured_seeds;
 
-            int score = minMax(local_board, local_eval, (turn + 1) % 2, !isMax, depth - 1);
-            if (local_eval != setNewEval(eval, score, isMax)) {
-                bestMove = new Move(move.indexPlay, move.color);
-                local_eval = setNewEval(eval, score, isMax);
+            int score = minMax(local_board, (turn + 1) % 2, !isMax, depth - 1);
+
+            if (isMax && score > local_eval) {
+                local_eval = score;
+                if (depth == maxDepth) {
+                    bestMove = new Move(move.indexPlay, move.color);
+                }
+            } else if (!isMax && score < local_eval) {
+                local_eval = score;
             }
+
 
             //TODO : implement alpha beta here.
 
         }
         parent_boards.pop();
         return local_eval;
-    }
-
-    private int setNewEval(int eval, int score, boolean isMax) {
-        if (isMax)
-            return Math.max(eval, score);
-        return Math.min(eval, score);
     }
 
     @Override
@@ -117,10 +129,10 @@ public class IA extends Player {
         if (turn == 0) start = 1;
         else start = 0;
         for (int i = start; i < 16; i += 2) {
-            if (!BoardOperations.has_seed_of_Color(board, i, Color.R) && !BoardOperations.has_seed_of_Color(board, i, Color.B) && BoardOperations.has_seed_of_Color(board, i, Color.TR))
-                return true;
+            if (BoardOperations.has_seed_of_Color(board, i, Color.R) || BoardOperations.has_seed_of_Color(board, i, Color.B) || BoardOperations.has_seed_of_Color(board, i, Color.TR))
+                return false;
         }
-        return false;
+        return true;
     }
 
     @Override
