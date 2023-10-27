@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
-import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
+import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.Random;
 

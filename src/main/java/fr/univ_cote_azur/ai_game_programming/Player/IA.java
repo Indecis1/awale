@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
-import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
+import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.LinkedList;
 import java.util.Stack;
@@ -32,6 +32,18 @@ public class IA extends Player {
         long time_start = System.nanoTime();
         int eval = minMax(board, turn, isMax, maxDepth);
         long time_end = System.nanoTime();
+        if( (time_end - time_start)/Math.pow(10, 9) < 0.009){
+            maxDepth+=2;
+            time_start = System.nanoTime();
+            eval = minMax(board, turn, isMax, maxDepth);
+            time_end = System.nanoTime();
+        }else if( (time_end - time_start)/Math.pow(10, 9) < 0.09){
+            maxDepth++;
+            time_start = System.nanoTime();
+            eval = minMax(board, turn, isMax, maxDepth);
+            time_end = System.nanoTime();
+        }
+
         int index_first_hole = bestMove[0];
         Color color = Color.to_Color(bestMove[1]);
 
@@ -51,7 +63,7 @@ public class IA extends Player {
     private int setMaxDepth(int[][] board) {
         int count_legitMoves = arraysOperations.count_LegitMoves(board, turn);
         int count_seeds = arraysOperations.count_seeds(board);
-        if (count_seeds > 67 &&  count_legitMoves > 25) {
+        if (count_seeds > 60 && count_legitMoves > 25) {
             return 4;
         } else if (count_seeds > 35 && count_legitMoves < 20) {
             return 6;
@@ -59,9 +71,9 @@ public class IA extends Player {
             return 7;
         } else if (count_seeds > 15 && count_legitMoves < 20) {
             return 9;
-        }  else if (count_seeds > 10 && count_legitMoves< 15) {
+        } else if (count_seeds > 10 && count_legitMoves < 15) {
             return 10;
-        }  else if (count_legitMoves < 10) {
+        } else if (count_legitMoves < 10) {
             return 11;
         } else return 5;
     }

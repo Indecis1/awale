@@ -1,6 +1,5 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-import fr.univ_cote_azur.ai_game_programming.Player.IA;
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
 import java.util.LinkedList;
