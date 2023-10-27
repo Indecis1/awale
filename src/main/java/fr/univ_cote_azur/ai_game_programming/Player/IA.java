@@ -13,41 +13,39 @@ public class IA extends Player {
     private int score;
     private int maxDepth;
     private int[] bestMove;
-    private int eval_Global;
 
     public IA(int turn) {
         this.turn = turn;
         this.score = 0;
         this.parent_boards = new Stack<>();
         this.bestMove = new int[2];
-        this.eval_Global = 0;
         this.maxDepth = 0;
     }
 
     @Override
     public void play(int[][] board) {
         this.maxDepth = setMaxDepth(board);
-        this.eval_Global = getScore();
+        int eval_Global = getScore();
         boolean isMax = true;
         long time_start = System.nanoTime();
-        int eval = minMax(board, turn, isMax, maxDepth);
+        eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
         long time_end = System.nanoTime();
         if( (time_end - time_start)/Math.pow(10, 9) < 0.009){
             maxDepth+=2;
             time_start = System.nanoTime();
-            eval = minMax(board, turn, isMax, maxDepth);
+            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
             time_end = System.nanoTime();
         }else if( (time_end - time_start)/Math.pow(10, 9) < 0.09){
             maxDepth++;
             time_start = System.nanoTime();
-            eval = minMax(board, turn, isMax, maxDepth);
+            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
             time_end = System.nanoTime();
         }
 
         int index_first_hole = bestMove[0];
         Color color = Color.to_Color(bestMove[1]);
 
-        System.out.println("AI play is : **" + (index_first_hole + 1) + color + "**. Evaluation for a " + maxDepth + " depth is :" + eval + " in " + (time_end - time_start) / Math.pow(10, 9) + "s.");
+        System.out.println("AI play is : **" + (index_first_hole + 1) + color + "**. Evaluation for a " + maxDepth + " depth is :" + eval_Global + " in " + (time_end - time_start) / Math.pow(10, 9) + "s.");
 
         int last_index = sowing(board, index_first_hole, color);
         int seed_captured = capturing(board, last_index);
@@ -63,7 +61,7 @@ public class IA extends Player {
     private int setMaxDepth(int[][] board) {
         int count_legitMoves = arraysOperations.count_LegitMoves(board, turn);
         int count_seeds = arraysOperations.count_seeds(board);
-        if (count_seeds > 60 && count_legitMoves > 25) {
+        if (count_seeds > 60     && count_legitMoves > 25) {
             return 4;
         } else if (count_seeds > 35 && count_legitMoves < 20) {
             return 6;
@@ -78,9 +76,9 @@ public class IA extends Player {
         } else return 5;
     }
 
-    private int minMax(int[][] board, int turn, boolean isMax, int depth) {
-        int save_eval = eval_Global;
-        int parent_eval = eval_Global;
+    private int minMax(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
+        int save_eval = eval_Parent;
+        int parent_eval = eval_Parent;
 
         int local_eval;
         if (isMax) local_eval = -100;
@@ -108,18 +106,19 @@ public class IA extends Player {
             int[][] local_board = new int[3][16];
             arraysOperations.deepCopy(parent_boards.get(parent_boards.size() - 1), local_board);
 
-            eval_Global = save_eval;
+            // reset eval pour nouveau min_max
+            eval_Parent = save_eval;
 
             player.simulate_play(local_board, move);
             int captured_seeds = player.getScore();
 
             // TODO : ajouter / supprimer le nombre de move legit par l'adversaire pour affiner notre fonction
-            if (isMax) eval_Global += captured_seeds;
-            else eval_Global -= captured_seeds;
+            if (isMax) eval_Parent += captured_seeds;
+            else eval_Parent -= captured_seeds;
 
             int score;
-            if (depth - 1 == -1) score = eval_Global;
-            else score = minMax(local_board, (turn + 1) % 2, !isMax, depth - 1);
+            if (depth - 1 == -1) score = eval_Parent;
+            else score = minMax(local_board, (turn + 1) % 2,eval_Parent, !isMax, depth - 1);
 
             local_eval = eval(isMax, local_eval, score, move, depth);
 
