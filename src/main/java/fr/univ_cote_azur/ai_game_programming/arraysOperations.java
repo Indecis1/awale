@@ -43,18 +43,19 @@ public class arraysOperations {
     }
 
     public static void print_Board(int[][] board) {
-        System.out.println();
-        for (int j = 0; j < 8; j++) {
-            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
-        }
-        System.out.println();
-        for (int j = 15; j >= 8; j--) {
-            System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
-        }
+        print_board(board);
         System.out.println("\n" + "-".repeat(90));
     }
 
     public static void print_Board(int[][] board, Player[] players) {
+        print_board(board);
+        System.out.println("\n\n");
+        players[0].printScore();
+        players[1].printScore();
+        System.out.println("\n" + "-".repeat(90));
+    }
+
+    private static void print_board(int[][] board) {
         System.out.println();
         for (int j = 0; j < 8; j++) {
             System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
@@ -63,10 +64,6 @@ public class arraysOperations {
         for (int j = 15; j >= 8; j--) {
             System.out.print((j + 1) + "(" + board[0][j] + "R," + board[1][j] + "B," + board[2][j] + "T)   ");
         }
-        System.out.println("\n\n");
-        players[0].printScore();
-        players[1].printScore();
-        System.out.println("\n" + "-".repeat(90));
     }
 
     public static boolean has_seed_of_Color(int[][] board, int index, Color color) {

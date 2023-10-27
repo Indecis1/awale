@@ -74,7 +74,7 @@ public class IA extends Player {
         }
 
 
-        parent_boards.push(board);
+        parent_boards.add(board);
         Simulate_Player player = new Simulate_Player(turn);
 
         for (int[] move : legitMoves) {
@@ -84,7 +84,7 @@ public class IA extends Player {
                 parent_eval = local_eval;
             }
             int[][] local_board = new int[3][16];
-            arraysOperations.deepCopy(parent_boards.peek(), local_board);
+            arraysOperations.deepCopy(parent_boards.get(parent_boards.size()-1), local_board);
 
             eval_Global = save_eval;
 
