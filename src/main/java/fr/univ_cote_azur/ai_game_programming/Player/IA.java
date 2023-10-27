@@ -1,9 +1,9 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
-import fr.univ_cote_azur.ai_game_programming.BoardOperations;
+import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Stack;
 
 public class IA extends Player {
@@ -12,14 +12,14 @@ public class IA extends Player {
     private final Stack<int[][]> parent_boards;
     private int score;
     private int maxDepth;
-    private Move bestMove;
+    private int[] bestMove;
     private int eval_Global;
 
     public IA(int turn) {
         this.turn = turn;
         this.score = 0;
         this.parent_boards = new Stack<>();
-        this.bestMove = new Move(0, null);
+        this.bestMove = new int[2];
         this.eval_Global = 0;
         this.maxDepth = 0;
     }
@@ -27,13 +27,13 @@ public class IA extends Player {
     @Override
     public void play(int[][] board) {
         this.maxDepth = setMaxDepth(board);
-        this.eval_Global = 0;
+        this.eval_Global = getScore();
         boolean isMax = true;
         long time_start = System.nanoTime();
         int eval = minMax(board, turn, isMax, maxDepth);
         long time_end = System.nanoTime();
-        int index_first_hole = bestMove.indexPlay;
-        Color color = bestMove.color;
+        int index_first_hole = bestMove[0];
+        Color color = Color.to_Color(bestMove[1]);
 
         System.out.println("AI play is : **" + (index_first_hole + 1) + color + "**. Evaluation for a " + maxDepth + " depth is :" + eval + " in " + (time_end - time_start) / Math.pow(10, 9) + "s.");
 
@@ -42,48 +42,49 @@ public class IA extends Player {
         add_to_score(seed_captured);
 
         if (otherPlayerIsStarving(board)) {
-            seed_captured = BoardOperations.count_seeds(board);
+            seed_captured = arraysOperations.count_seeds(board);
             add_to_score(seed_captured);
-            BoardOperations.emptyBoard(board);
+            arraysOperations.emptyBoard(board);
         }
     }
-    private int setMaxDepth(int[][] board){
-        if (BoardOperations.count_seeds(board) > 74)
-            return 4;
-        else if (BoardOperations.count_seeds(board) > 50) {
+
+    private int setMaxDepth(int[][] board) {
+        if (arraysOperations.count_seeds(board) > 74) return 4;
+        else if (arraysOperations.count_seeds(board) > 50) {
             return 5;
-        } else
-            return 4;
+        } else return 4;
     }
 
     private int minMax(int[][] board, int turn, boolean isMax, int depth) {
-        if (depth == -1) {
-            return eval_Global;
-        }
-
         int save_eval = eval_Global;
+        int parent_eval = eval_Global;
 
         int local_eval;
-        if (isMax)
-            local_eval = -100;
-        else
-            local_eval = 100;
+        if (isMax) local_eval = -100;
+        else local_eval = 100;
 
-        ArrayList<Move> legitMoves = BoardOperations.setLegitMoves(board, turn);
+        LinkedList<int[]> legitMoves = arraysOperations.setLegitMoves(board, turn);
         if (legitMoves.isEmpty() && isMax) {
             return -100;
         } else if (legitMoves.isEmpty()) {
             return 100;
         }
-        if (depth == maxDepth) bestMove = new Move(legitMoves.get(0).indexPlay, legitMoves.get(0).color);
+        if (depth == maxDepth) {
+            arraysOperations.deepCopy(legitMoves.getFirst(), bestMove);
+        }
 
 
         parent_boards.push(board);
         Simulate_Player player = new Simulate_Player(turn);
 
-        for (Move move : legitMoves) {
+        for (int[] move : legitMoves) {
+            if(isMax && local_eval > parent_eval)
+                parent_eval = local_eval;
+            else if (!isMax && local_eval < parent_eval) {
+                parent_eval = local_eval;
+            }
             int[][] local_board = new int[3][16];
-            BoardOperations.deepCopy(parent_boards.peek(), local_board);
+            arraysOperations.deepCopy(parent_boards.peek(), local_board);
 
             eval_Global = save_eval;
 
@@ -93,33 +94,34 @@ public class IA extends Player {
             if (isMax) eval_Global += captured_seeds;
             else eval_Global -= captured_seeds;
 
-            int score = minMax(local_board, (turn + 1) % 2, !isMax, depth - 1);
+            int score;
+            if (depth - 1 == -1) score = eval_Global;
+            else score = minMax(local_board, (turn + 1) % 2, !isMax, depth - 1);
 
-            if (isMax && score > local_eval) {
-                local_eval = score;
-                if (depth == maxDepth) {
-                    bestMove = new Move(move.indexPlay, move.color);
-                }
-            } else if (!isMax && score < local_eval) {
-                local_eval = score;
+            local_eval = eval(isMax, local_eval, score, move, depth);
+
+            if ((isMax && local_eval > parent_eval) || (!isMax && local_eval < parent_eval)) {
+                parent_boards.pop();
+                return parent_eval;
             }
-
-            if (isMax && coupe_alpha(save_eval, local_eval))
-                break;
-            else if (!isMax && coupe_Beta(save_eval, local_eval))
-                break;
-
         }
+        
         parent_boards.pop();
         return local_eval;
     }
 
-    private boolean coupe_Beta(int val_parent, int val_fils) {
-        return val_fils < val_parent;
-    }
-
-    private boolean coupe_alpha(int val_parent, int val_fils) {
-        return val_fils > val_parent;
+    private int eval(boolean isMax, int local_eval, int score, int[] move, int depth) {
+        if (isMax) {
+            if (score > local_eval) {
+                local_eval = score;
+                if (depth == maxDepth) arraysOperations.deepCopy(move, bestMove);
+            }
+        } else {
+            if (score < local_eval) {
+                local_eval = score;
+            }
+        }
+        return local_eval;
     }
 
     @Override
@@ -129,8 +131,8 @@ public class IA extends Player {
 
     @Override
     int sowing(int[][] board, int index_first_hole, Color color) {
-        int seeds = BoardOperations.get_seedColor(board, index_first_hole, color);
-        BoardOperations.emptySeedColor_at_index(board, index_first_hole, color);
+        int seeds = arraysOperations.get_seedColor(board, index_first_hole, color);
+        arraysOperations.emptySeedColor_at_index(board, index_first_hole, color);
         if (color == Color.R || color == Color.TR) return sowingRed(board, index_first_hole, color, seeds);
         else return sowingBlue(board, index_first_hole, color, seeds);
     }
@@ -141,7 +143,7 @@ public class IA extends Player {
         if (turn == 0) start = 1;
         else start = 0;
         for (int i = start; i < 16; i += 2) {
-            if (BoardOperations.has_seed_of_Color(board, i, Color.R) || BoardOperations.has_seed_of_Color(board, i, Color.B) || BoardOperations.has_seed_of_Color(board, i, Color.TR))
+            if (arraysOperations.has_seed_of_Color(board, i, Color.R) || arraysOperations.has_seed_of_Color(board, i, Color.B) || arraysOperations.has_seed_of_Color(board, i, Color.TR))
                 return false;
         }
         return true;
@@ -156,7 +158,7 @@ public class IA extends Player {
         score += seedCaptured;
     }
 
-    public record Move(int indexPlay, Color color) {
-    }
+//    public record Move(int indexPlay, Color color) {
+//    }
 
 }

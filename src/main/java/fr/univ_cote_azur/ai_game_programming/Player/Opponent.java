@@ -1,6 +1,6 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
-import fr.univ_cote_azur.ai_game_programming.BoardOperations;
+import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
 
 import java.util.Scanner;
@@ -37,9 +37,9 @@ public class Opponent extends Player {
 
         if (otherPlayerIsStarving(board)) {
             System.out.println("IA IS STARVING");
-            seed_captured = BoardOperations.count_seeds(board);
+            seed_captured = arraysOperations.count_seeds(board);
             add_to_score(seed_captured);
-            BoardOperations.emptyBoard(board);
+            arraysOperations.emptyBoard(board);
         }
     }
 
@@ -55,7 +55,7 @@ public class Opponent extends Player {
             throw new IllegalArgumentException("Impossible play from Opponent... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
         else if (index_first_hole % 2 != turn)
             throw new IllegalArgumentException("Impossible play from Opponent... Number parity is incorrect.");
-        else if (!BoardOperations.has_seed_of_Color(board, index_first_hole, color))
+        else if (!arraysOperations.has_seed_of_Color(board, index_first_hole, color))
             throw new IllegalArgumentException("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + " seeds.");
     }
 
@@ -89,8 +89,8 @@ public class Opponent extends Player {
 
     @Override
     int sowing(int[][] board, int index_first_hole, Color color) {
-        int seeds = BoardOperations.get_seedColor(board, index_first_hole, color);
-        BoardOperations.emptySeedColor_at_index(board, index_first_hole, color);
+        int seeds = arraysOperations.get_seedColor(board, index_first_hole, color);
+        arraysOperations.emptySeedColor_at_index(board, index_first_hole, color);
         if (color == Color.R || color == Color.TR) return sowingRed(board, index_first_hole, color, seeds);
         else return sowingBlue(board, index_first_hole, color, seeds);
     }
@@ -102,7 +102,7 @@ public class Opponent extends Player {
         if (turn == 0) start = 1;
         else start = 0;
         for (int i = start; i < 16; i += 2) {
-            if (BoardOperations.has_seed_of_Color(board, i, Color.R) || BoardOperations.has_seed_of_Color(board, i, Color.B) || BoardOperations.has_seed_of_Color(board, i, Color.TR))
+            if (arraysOperations.has_seed_of_Color(board, i, Color.R) || arraysOperations.has_seed_of_Color(board, i, Color.B) || arraysOperations.has_seed_of_Color(board, i, Color.TR))
                 return false;
         }
         return true;

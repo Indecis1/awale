@@ -5,7 +5,7 @@ import java.util.Random;
 public enum Color {
     R, B, TR, TB, UNDEFINED;
 
-    public static int to_int(Color color) {
+    public static int to_index(Color color) {
         if (color.equals(R)) return 0;
         else if (color.equals(B)) return 1;
         else return 2;

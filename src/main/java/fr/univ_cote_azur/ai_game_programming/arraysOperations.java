@@ -3,9 +3,9 @@ package fr.univ_cote_azur.ai_game_programming;
 import fr.univ_cote_azur.ai_game_programming.Player.IA;
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class BoardOperations {
+public class arraysOperations {
 
 
     public static int count_seeds(int[][] board) {
@@ -85,18 +85,22 @@ public class BoardOperations {
         return board[line][index];
     }
 
-    public static ArrayList<IA.Move> setLegitMoves(int[][] board, int index_start) {
-        ArrayList<IA.Move> legitMoves = new ArrayList<>();
+    public static LinkedList<int[]> setLegitMoves(int[][] board, int index_start) {
+        LinkedList<int[]> legitMoves = new LinkedList<>();
+
         for (int j = index_start; j < 16; j += 2) {
-            if (board[0][j] > 0)
-                legitMoves.add(new IA.Move(j, Color.R));
-            if (board[1][j] > 0)
-                legitMoves.add(new IA.Move(j, Color.B));
+            if (board[0][j] > 0) {
+                legitMoves.push(new int[]{j, 0});
+            }
+            if (board[1][j] > 0) {
+                legitMoves.push(new int[]{j, 1});
+            }
             if (board[2][j] > 0) {
-                legitMoves.add(new IA.Move(j, Color.TR));
-                legitMoves.add(new IA.Move(j, Color.TB));
+                legitMoves.push(new int[]{j, 2});
+                legitMoves.push(new int[]{j, 3});
             }
         }
+
         return legitMoves;
     }
 
@@ -104,6 +108,9 @@ public class BoardOperations {
         for (int i = 0; i < 3; i++) {
             System.arraycopy(source_board[i], 0, new_board[i], 0, 16);
         }
+    }
+    public static void deepCopy(int[] source_board, int[] new_board) {
+            System.arraycopy(source_board, 0, new_board, 0, 2);
     }
 
 }

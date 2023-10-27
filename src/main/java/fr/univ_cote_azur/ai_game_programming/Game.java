@@ -45,11 +45,11 @@ public class Game {
     public void start() {
         boolean endGame = false;
         int turn = 0;
-        BoardOperations.print_Board(board);
+        arraysOperations.print_Board(board);
         while (!endGame) {
             if (playerOrder[turn] instanceof Random_IA) op.play(board);
             else ia.play(board);
-            BoardOperations.print_Board(board, playerOrder);
+            arraysOperations.print_Board(board, playerOrder);
             printEndGamesCondition();
             endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds();
             turn = (turn + 1) % 2;
@@ -85,6 +85,6 @@ public class Game {
     }
 
     private boolean notEnoughSeeds() {
-        return BoardOperations.count_seeds(board) < 10;
+        return arraysOperations.count_seeds(board) < 10;
     }
 }

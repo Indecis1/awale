@@ -1,6 +1,6 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
-import fr.univ_cote_azur.ai_game_programming.BoardOperations;
+import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 import fr.univ_cote_azur.ai_game_programming.Color;
 
 import static java.lang.System.exit;
@@ -10,9 +10,9 @@ public class Simulate_Player extends Opponent {
         super(turn);
     }
 
-    public void simulate_play(int[][] board, IA.Move move) {
-        int index_first_hole = move.indexPlay();
-        Color color = move.color();
+    public void simulate_play(int[][] board, int[] move) {
+        int index_first_hole = move[0];
+        Color color = Color.to_Color(move[1]);
         try {
             legitPlay(board, index_first_hole, color);
         } catch (IllegalArgumentException e) {
@@ -25,9 +25,9 @@ public class Simulate_Player extends Opponent {
         add_to_score(seed_captured);
 
         if (otherPlayerIsStarving(board)) {
-            seed_captured = BoardOperations.count_seeds(board);
+            seed_captured = arraysOperations.count_seeds(board);
             add_to_score(seed_captured);
-            BoardOperations.emptyBoard(board);
+            arraysOperations.emptyBoard(board);
         }
     }
 
@@ -39,7 +39,7 @@ public class Simulate_Player extends Opponent {
             throw new IllegalArgumentException("Impossible play from Simulate_Player... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
         else if (index_first_hole % 2 != turn)
             throw new IllegalArgumentException("Impossible play from Simulate_Player... Number parity is incorrect.");
-        else if (!BoardOperations.has_seed_of_Color(board, index_first_hole, color))
+        else if (!arraysOperations.has_seed_of_Color(board, index_first_hole, color))
             throw new IllegalArgumentException("Impossible play from Simulate_Player... " + (index_first_hole + 1) + " hole has no " + color + " seeds.");
     }
 
