@@ -12,7 +12,7 @@ public class IA extends Player {
     private final Stack<int[][]> parent_boards;
     private int score;
     private int maxDepth;
-    private int[] bestMove;
+    private final int[] bestMove;
 
     public IA(int turn) {
         this.turn = turn;
@@ -76,6 +76,7 @@ public class IA extends Player {
         } else return 5;
     }
 
+    //TODO : Multi-threading si possible pour le fond 1
     private int minMax(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
         int save_eval = eval_Parent;
         int parent_eval = eval_Parent;
@@ -179,8 +180,5 @@ public class IA extends Player {
     private void add_to_score(int seedCaptured) {
         score += seedCaptured;
     }
-
-//    public record Move(int indexPlay, Color color) {
-//    }
 
 }
