@@ -49,10 +49,21 @@ public class IA extends Player {
     }
 
     private int setMaxDepth(int[][] board) {
-        if (arraysOperations.count_seeds(board) > 74) return 4;
-        else if (arraysOperations.count_seeds(board) > 50) {
-            return 5;
-        } else return 4;
+        int count_legitMoves = arraysOperations.count_LegitMoves(board, turn);
+        int count_seeds = arraysOperations.count_seeds(board);
+        if (count_seeds > 67 &&  count_legitMoves > 25) {
+            return 4;
+        } else if (count_seeds > 35 && count_legitMoves < 20) {
+            return 6;
+        } else if (count_seeds > 25 && count_legitMoves < 20) {
+            return 7;
+        } else if (count_seeds > 15 && count_legitMoves < 20) {
+            return 9;
+        }  else if (count_seeds > 10 && count_legitMoves< 15) {
+            return 10;
+        }  else if (count_legitMoves < 10) {
+            return 11;
+        } else return 5;
     }
 
     private int minMax(int[][] board, int turn, boolean isMax, int depth) {
@@ -78,19 +89,19 @@ public class IA extends Player {
         Simulate_Player player = new Simulate_Player(turn);
 
         for (int[] move : legitMoves) {
-            if(isMax && local_eval > parent_eval)
-                parent_eval = local_eval;
+            if (isMax && local_eval > parent_eval) parent_eval = local_eval;
             else if (!isMax && local_eval < parent_eval) {
                 parent_eval = local_eval;
             }
             int[][] local_board = new int[3][16];
-            arraysOperations.deepCopy(parent_boards.get(parent_boards.size()-1), local_board);
+            arraysOperations.deepCopy(parent_boards.get(parent_boards.size() - 1), local_board);
 
             eval_Global = save_eval;
 
             player.simulate_play(local_board, move);
             int captured_seeds = player.getScore();
 
+            // TODO : ajouter / supprimer le nombre de move legit par l'adversaire pour affiner notre fonction
             if (isMax) eval_Global += captured_seeds;
             else eval_Global -= captured_seeds;
 
@@ -105,7 +116,7 @@ public class IA extends Player {
                 return parent_eval;
             }
         }
-        
+
         parent_boards.pop();
         return local_eval;
     }

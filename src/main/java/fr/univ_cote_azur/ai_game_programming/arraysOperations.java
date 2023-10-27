@@ -101,13 +101,32 @@ public class arraysOperations {
         return legitMoves;
     }
 
+    public static int count_LegitMoves(int[][] board, int index_start) {
+        int count = 0;
+
+        for (int j = index_start; j < 16; j += 2) {
+            if (board[0][j] > 0) {
+                count++;
+            }
+            if (board[1][j] > 0) {
+                count++;
+            }
+            if (board[2][j] > 0) {
+                count += 2;
+            }
+        }
+
+        return count;
+    }
+
     public static void deepCopy(int[][] source_board, int[][] new_board) {
         for (int i = 0; i < 3; i++) {
             System.arraycopy(source_board[i], 0, new_board[i], 0, 16);
         }
     }
+
     public static void deepCopy(int[] source_board, int[] new_board) {
-            System.arraycopy(source_board, 0, new_board, 0, 2);
+        System.arraycopy(source_board, 0, new_board, 0, 2);
     }
 
 }
