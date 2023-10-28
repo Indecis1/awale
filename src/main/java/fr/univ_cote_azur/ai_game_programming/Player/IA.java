@@ -1,23 +1,22 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
 import fr.univ_cote_azur.ai_game_programming.Color;
+import fr.univ_cote_azur.ai_game_programming.Thread.Task;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Stack;
 
 public class IA extends Player {
 
     private final int turn;
-    private final Stack<int[][]> parent_boards;
+    private final int[] bestMove;
     private int score;
     private int maxDepth;
-    private final int[] bestMove;
 
     public IA(int turn) {
         this.turn = turn;
         this.score = 0;
-        this.parent_boards = new Stack<>();
         this.bestMove = new int[2];
         this.maxDepth = 0;
     }
@@ -28,19 +27,19 @@ public class IA extends Player {
         int eval_Global = getScore();
         boolean isMax = true;
         long time_start = System.nanoTime();
-        eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
+        eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
         long time_end = System.nanoTime();
-        if( (time_end - time_start)/Math.pow(10, 9) < 0.009){
-            maxDepth+=2;
-            time_start = System.nanoTime();
-            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
-            time_end = System.nanoTime();
-        }else if( (time_end - time_start)/Math.pow(10, 9) < 0.09){
-            maxDepth++;
-            time_start = System.nanoTime();
-            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
-            time_end = System.nanoTime();
-        }
+//        if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
+//            maxDepth += 2;
+//            time_start = System.nanoTime();
+//            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
+//            time_end = System.nanoTime();
+//        } else if ((time_end - time_start) / Math.pow(10, 9) < 0.09) {
+//            maxDepth++;
+//            time_start = System.nanoTime();
+//            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
+//            time_end = System.nanoTime();
+//        }
 
         int index_first_hole = bestMove[0];
         Color color = Color.to_Color(bestMove[1]);
@@ -61,7 +60,7 @@ public class IA extends Player {
     private int setMaxDepth(int[][] board) {
         int count_legitMoves = arraysOperations.count_LegitMoves(board, turn);
         int count_seeds = arraysOperations.count_seeds(board);
-        if (count_seeds > 60     && count_legitMoves > 25) {
+        if (count_seeds > 60 && count_legitMoves > 25) {
             return 4;
         } else if (count_seeds > 35 && count_legitMoves < 20) {
             return 6;
@@ -76,76 +75,108 @@ public class IA extends Player {
         } else return 5;
     }
 
-    //TODO : Multi-threading si possible pour le fond 1
-    private int minMax(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
-        int save_eval = eval_Parent;
-        int parent_eval = eval_Parent;
-
-        int local_eval;
-        if (isMax) local_eval = -100;
-        else local_eval = 100;
-
+    private int min_max_parent(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
+        ArrayList<Integer> scores = new ArrayList<>();
         LinkedList<int[]> legitMoves = arraysOperations.setLegitMoves(board, turn);
-        if (legitMoves.isEmpty() && isMax) {
-            return -100;
-        } else if (legitMoves.isEmpty()) {
-            return 100;
+
+        Thread[] threads = new Thread[legitMoves.size()];
+        Task[] tasks = new Task[legitMoves.size()];
+
+        for (int i = 0; i < legitMoves.size(); i++) {
+            tasks[i] = new Task(i, board, turn, eval_Parent, isMax, depth, legitMoves.get(i));
+            threads[i] = new Thread(tasks[i]);
+            threads[i].start();
         }
-        if (depth == maxDepth) {
-            arraysOperations.deepCopy(legitMoves.getFirst(), bestMove);
-        }
-
-
-        parent_boards.add(board);
-        Simulate_Player player = new Simulate_Player(turn);
-
-        for (int[] move : legitMoves) {
-            if (isMax && local_eval > parent_eval) parent_eval = local_eval;
-            else if (!isMax && local_eval < parent_eval) {
-                parent_eval = local_eval;
-            }
-            int[][] local_board = new int[3][16];
-            arraysOperations.deepCopy(parent_boards.get(parent_boards.size() - 1), local_board);
-
-            // reset eval pour nouveau min_max
-            eval_Parent = save_eval;
-
-            player.simulate_play(local_board, move);
-            int captured_seeds = player.getScore();
-
-            // TODO : ajouter / supprimer le nombre de move legit par l'adversaire pour affiner notre fonction
-            if (isMax) eval_Parent += captured_seeds;
-            else eval_Parent -= captured_seeds;
-
-            int score;
-            if (depth - 1 == -1) score = eval_Parent;
-            else score = minMax(local_board, (turn + 1) % 2,eval_Parent, !isMax, depth - 1);
-
-            local_eval = eval(isMax, local_eval, score, move, depth);
-
-            if ((isMax && local_eval > parent_eval) || (!isMax && local_eval < parent_eval)) {
-                parent_boards.pop();
-                return parent_eval;
+        for (int i = 0; i < legitMoves.size(); i++) {
+            try {
+                threads[i].join(); // Attend la fin de chaque thread
+                scores.add(tasks[i].getEval()); // Supposons que chaque tâche a une méthode pour récupérer le résultat
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
-        parent_boards.pop();
-        return local_eval;
+        int bestScore = scores.get(0);
+        arraysOperations.deepCopy(legitMoves.getFirst(), bestMove);
+        for (int i = 1; i < scores.size(); i++) {
+            if (bestScore < scores.get(i)) {
+                bestScore = scores.get(i);
+                arraysOperations.deepCopy(legitMoves.get(i), bestMove);
+            }
+        }
+
+        return bestScore;
     }
 
-    private int eval(boolean isMax, int local_eval, int score, int[] move, int depth) {
-        if (isMax) {
-            if (score > local_eval) {
-                local_eval = score;
-                if (depth == maxDepth) arraysOperations.deepCopy(move, bestMove);
-            }
-        } else {
-            if (score < local_eval) {
-                local_eval = score;
-            }
-        }
-        return local_eval;
-    }
+    //TODO : Multi-threading si possible pour le fond 1
+//    public int minMax(LinkedList<int[][]> parent_boards, int turn, int eval_Parent, boolean isMax, int depth) {
+//
+//        int save_eval = eval_Parent;
+//        int parent_eval = eval_Parent;
+//
+//        int local_eval;
+//        if (isMax) local_eval = -100;
+//        else local_eval = 100;
+//
+//        LinkedList<int[]> legitMoves = arraysOperations.setLegitMoves(parent_boards.get(parent_boards.size() - 1), turn);
+//        if (legitMoves.isEmpty() && isMax) {
+//            return -100;
+//        } else if (legitMoves.isEmpty()) {
+//            return 100;
+//        }
+//
+//        Simulate_Player player = new Simulate_Player(turn);
+//
+//        for (int[] move : legitMoves) {
+//            if (isMax && local_eval > parent_eval) parent_eval = local_eval;
+//            else if (!isMax && local_eval < parent_eval) {
+//                parent_eval = local_eval;
+//            }
+//            int[][] local_board = new int[3][16];
+//            arraysOperations.deepCopy(parent_boards.get(parent_boards.size() - 1), local_board);
+//
+//            // reset eval pour nouveau min_max
+//            eval_Parent = save_eval;
+//
+//            player.simulate_play(local_board, move);
+//            int captured_seeds = player.getScore();
+//
+//            // TODO : ajouter / supprimer le nombre de move legit par l'adversaire pour affiner notre fonction
+//            if (isMax) eval_Parent += captured_seeds;
+//            else eval_Parent -= captured_seeds;
+//
+//            int score;
+//            if (depth - 1 == -1) score = eval_Parent;
+//            else {
+//                parent_boards.add(local_board);
+//                score = minMax(parent_boards, (turn + 1) % 2, eval_Parent, !isMax, depth - 1);
+//            }
+//
+//            local_eval = eval(isMax, local_eval, score, move, depth);
+//
+//            if ((isMax && local_eval > parent_eval) || (!isMax && local_eval < parent_eval)) {
+//                parent_boards.pop();
+//                return parent_eval;
+//            }
+//        }
+//
+//        parent_boards.pop();
+//        return local_eval;
+//    }
+//
+//    private int eval(boolean isMax, int local_eval, int score, int[] move, int depth) {
+//        if (isMax) {
+//            if (score > local_eval) {
+//                local_eval = score;
+//                if (depth == maxDepth) arraysOperations.deepCopy(move, bestMove);
+//            }
+//        } else {
+//            if (score < local_eval) {
+//                local_eval = score;
+//            }
+//        }
+//        return local_eval;
+//    }
 
     @Override
     public int getScore() {
