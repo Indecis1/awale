@@ -2,6 +2,7 @@ package fr.univ_cote_azur.ai_game_programming;
 
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class arraysOperations {
@@ -81,19 +82,19 @@ public class arraysOperations {
         return board[line][index];
     }
 
-    public static LinkedList<int[]> setLegitMoves(int[][] board, int index_start) {
-        LinkedList<int[]> legitMoves = new LinkedList<>();
+    public static ArrayList<int[]> setLegitMoves(int[][] board, int index_start) {
+        ArrayList<int[]> legitMoves = new ArrayList<>();
 
         for (int j = index_start; j < 16; j += 2) {
             if (board[0][j] > 0) {
-                legitMoves.push(new int[]{j, 0});
+                legitMoves.add(new int[]{j, 0});
             }
             if (board[1][j] > 0) {
-                legitMoves.push(new int[]{j, 1});
+                legitMoves.add(new int[]{j, 1});
             }
             if (board[2][j] > 0) {
-                legitMoves.push(new int[]{j, 2});
-                legitMoves.push(new int[]{j, 3});
+                legitMoves.add(new int[]{j, 2});
+                legitMoves.add(new int[]{j, 3});
             }
         }
 
