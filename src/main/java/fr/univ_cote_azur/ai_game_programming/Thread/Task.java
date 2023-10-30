@@ -34,7 +34,7 @@ public class Task implements Runnable {
         int local_evals = local_evaluation;
         final ArrayList<int[][]> parent_boards = new ArrayList<>();
         parent_boards.add(board);
-        local_evaluation = minMax(parent_boards, (turn + 1) % 2, move, local_evals, !isMax, depth - 1);
+        local_evaluation = minMax(parent_boards, (turn + 1) % 2, move, local_evals, !isMax, depth);
         parent_boards.remove(parent_boards.size() - 1);
     }
 
@@ -47,24 +47,20 @@ public class Task implements Runnable {
         Simulate_Player player = new Simulate_Player((turn + 1) % 2);
         player.setScore(0);
         player.simulate_play(local_board, parent_move);
-        parent_boards.add(local_board);
         int captured_seeds = player.getScore();
         // Si on est max, le parent etait en min. Donc ce move nous fait perdre des points.
         if (isMax) local_eval -= captured_seeds;
         else local_eval += captured_seeds;
 
         if (depth - 1 == -1) {
-            parent_boards.remove(parent_boards.size() - 1);
             return local_eval;
         }
 
-
+        parent_boards.add(local_board);
         ArrayList<int[]> legitMoves = arraysOperations.setLegitMoves(parent_boards.get(parent_boards.size() - 1), turn);
         if (legitMoves.isEmpty() && isMax) {
-            parent_boards.remove(parent_boards.size() - 1);
             return -100;
         } else if (legitMoves.isEmpty()) {
-            parent_boards.remove(parent_boards.size() - 1);
             return 100;
         }
 
@@ -72,16 +68,17 @@ public class Task implements Runnable {
         if (isMax) bestEval = -100;
         else bestEval = 100;
 
+
         for (int[] move : legitMoves) {
-            
+
             int score = minMax(parent_boards, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
             bestEval = eval(isMax, bestEval, score);
-
+            //TODO : ALPHA BETA MARCHE PAS ZEBI A AMELIORER LA MERDE QUOI
             // alpha beta
-            if (depth - 1 != -1 && ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval))) {
-                parent_boards.remove(parent_boards.size() - 1);
-                return parent_eval;
-            }
+//            if (depth - 1 != -1 && ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval))) {
+//                parent_boards.remove(parent_boards.size() - 1);
+//                return parent_eval;
+//            }
         }
         parent_boards.remove(parent_boards.size() - 1);
         return bestEval;
