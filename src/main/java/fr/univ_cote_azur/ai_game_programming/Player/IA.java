@@ -5,7 +5,6 @@ import fr.univ_cote_azur.ai_game_programming.Thread.Task;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class IA extends Player {
 
@@ -29,17 +28,15 @@ public class IA extends Player {
         long time_start = System.nanoTime();
         eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
         long time_end = System.nanoTime();
-//        if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
-//            maxDepth += 2;
-//            time_start = System.nanoTime();
-//            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
-//            time_end = System.nanoTime();
-//        } else if ((time_end - time_start) / Math.pow(10, 9) < 0.09) {
-//            maxDepth++;
-//            time_start = System.nanoTime();
-//            eval_Global = minMax(board, turn, eval_Global, isMax, maxDepth);
-//            time_end = System.nanoTime();
-//        }
+        if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
+            maxDepth += 2;
+            eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
+            time_end = System.nanoTime();
+        } else if ((time_end - time_start) / Math.pow(10, 9) < 0.09) {
+            maxDepth++;
+            eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
+            time_end = System.nanoTime();
+        }
 
         int index_first_hole = bestMove[0];
         Color color = Color.to_Color(bestMove[1]);
@@ -91,7 +88,7 @@ public class IA extends Player {
             try {
                 threads[i].join(); // Attend la fin de chaque thread
                 scores.add(tasks[i].getEval()); // Supposons que chaque tâche a une méthode pour récupérer le résultat
-                System.out.println("" + legitMoves.get(i)[0] + Color.to_Color(legitMoves.get(i)[1]) + " score : " + scores.get(i));
+                //System.out.println("" + legitMoves.get(i)[0] + Color.to_Color(legitMoves.get(i)[1]) + " score : " + scores.get(i));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -110,6 +107,7 @@ public class IA extends Player {
 
         return bestScore;
     }
+
     @Override
     public int getScore() {
         return score;

@@ -31,17 +31,13 @@ public class Task implements Runnable {
         boolean isMax = this.isMax;
         int depth = this.depth;
         int turn = this.turn;
-        int local_evals = local_evaluation;
-        final ArrayList<int[][]> parent_boards = new ArrayList<>();
-        parent_boards.add(board);
-        local_evaluation = minMax(parent_boards, (turn + 1) % 2, move, local_evals, !isMax, depth);
-        parent_boards.remove(parent_boards.size() - 1);
+        local_evaluation = minMax(board, (turn + 1) % 2, move, local_evaluation, !isMax, depth);
     }
 
-    public synchronized int minMax(ArrayList<int[][]> parent_boards, int turn, int[] parent_move, int parent_eval, boolean isMax, int depth) {
+    public synchronized int minMax(int[][] parent_board, int turn, int[] parent_move, int parent_eval, boolean isMax, int depth) {
 
         int[][] local_board = new int[3][16];
-        arraysOperations.deepCopy(parent_boards.get(parent_boards.size() - 1), local_board);
+        arraysOperations.deepCopy(parent_board, local_board);
         int local_eval = parent_eval;
         // Simulate the parent play here.
         Simulate_Player player = new Simulate_Player((turn + 1) % 2);
@@ -56,8 +52,7 @@ public class Task implements Runnable {
             return local_eval;
         }
 
-        parent_boards.add(local_board);
-        ArrayList<int[]> legitMoves = arraysOperations.setLegitMoves(parent_boards.get(parent_boards.size() - 1), turn);
+        ArrayList<int[]> legitMoves = arraysOperations.setLegitMoves(local_board, turn);
         if (legitMoves.isEmpty() && isMax) {
             return -100;
         } else if (legitMoves.isEmpty()) {
@@ -71,7 +66,7 @@ public class Task implements Runnable {
 
         for (int[] move : legitMoves) {
 
-            int score = minMax(parent_boards, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
+            int score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
             if (move == legitMoves.get(0)) {
                 bestEval = score;
@@ -84,12 +79,12 @@ public class Task implements Runnable {
                 break;
             }
         }
-        parent_boards.remove(parent_boards.size() - 1);
         return bestEval;
     }
 
     private synchronized int eval(boolean isMax, int local_parent_eval, int score) {
-        if ((isMax && score > local_parent_eval) || (!isMax && score < local_parent_eval)) return score;
+        if (isMax && score > local_parent_eval) return score;
+        if (!isMax && score < local_parent_eval) return score;
         return local_parent_eval;
     }
 
