@@ -62,7 +62,7 @@ public class IA extends Player {
         int count_seeds = arraysOperations.count_seeds(board);
         if (count_seeds > 60 && count_legitMoves > 25) {
             return 4;
-        } else if (count_seeds < 50 && count_legitMoves < 20) {
+        } else if (count_seeds > 50 && count_legitMoves < 20) {
             return 6;
         } else if (count_seeds > 25 && count_legitMoves < 20) {
             return 7;

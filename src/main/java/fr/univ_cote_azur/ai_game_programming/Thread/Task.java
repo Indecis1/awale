@@ -72,21 +72,25 @@ public class Task implements Runnable {
         for (int[] move : legitMoves) {
 
             int score = minMax(parent_boards, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
+
+            if (move == legitMoves.get(0)) {
+                bestEval = score;
+                continue;
+            }
+
             bestEval = eval(isMax, bestEval, score);
-            //TODO : ALPHA BETA MARCHE PAS ZEBI A AMELIORER LA MERDE QUOI
-            // alpha beta
-//            if (depth - 1 != -1 && ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval))) {
-//                parent_boards.remove(parent_boards.size() - 1);
-//                return parent_eval;
-//            }
+
+            if ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval)) {
+                break;
+            }
         }
         parent_boards.remove(parent_boards.size() - 1);
         return bestEval;
     }
 
-    private synchronized int eval(boolean isMax, int bestEval, int score) {
-        if ((isMax && score > bestEval) || (!isMax && score < bestEval)) return score;
-        return bestEval;
+    private synchronized int eval(boolean isMax, int local_parent_eval, int score) {
+        if ((isMax && score > local_parent_eval) || (!isMax && score < local_parent_eval)) return score;
+        return local_parent_eval;
     }
 
     public int getEval() {
