@@ -26,21 +26,24 @@ public abstract class Player {
         int index = 0;
         for (int i = index_first_hole + 1; seeds > 0; i++) {
             index = i % 16;
-            if (index == index_first_hole) continue;
-            board[color_int][index]++;
-            seeds--;
+            if (index != index_first_hole) {
+                board[color_int][index]++;
+                seeds--;
+            }
         }
         return index;
     }
+
 
     protected int sowingBlue(int[][] board, int index_first_hole, Color color, int seeds) {
         int color_int = Color.to_index(color);
         int index = 0;
         for (int i = index_first_hole + 1; seeds > 0; i += 2) {
             index = i % 16;
-            if (index == index_first_hole) continue;
-            board[color_int][index]++;
-            seeds--;
+            if (index != index_first_hole) {
+                board[color_int][index]++;
+                seeds--;
+            }
         }
         return index;
     }

@@ -85,15 +85,13 @@ public class arraysOperations {
         ArrayList<int[]> legitMoves = new ArrayList<>();
 
         for (int j = index_start; j < 16; j += 2) {
-            if (board[0][j] > 0) {
-                legitMoves.add(new int[]{j, 0});
-            }
-            if (board[1][j] > 0) {
-                legitMoves.add(new int[]{j, 1});
-            }
-            if (board[2][j] > 0) {
-                legitMoves.add(new int[]{j, 2});
-                legitMoves.add(new int[]{j, 3});
+            for (int i = 0; i < 3; i++) {
+                if (board[i][j] > 0) {
+                    legitMoves.add(new int[]{j, i});
+                    if (i == 2) {
+                        legitMoves.add(new int[]{j, 3});
+                    }
+                }
             }
         }
 
