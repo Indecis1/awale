@@ -14,7 +14,7 @@ public class Simulate_Player extends Opponent {
         int index_first_hole = move[0];
         Color color = Color.to_Color(move[1]);
         try {
-            legitPlay(board, index_first_hole, color);
+            legitPlay_sim(board, index_first_hole, color);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             exit(0);
@@ -31,8 +31,7 @@ public class Simulate_Player extends Opponent {
         }
     }
 
-    @Override
-    void legitPlay(int[][] board, int index_first_hole, Color color) {
+    private void legitPlay_sim(int[][] board, int index_first_hole, Color color) {
         boolean possibleNumber = 0 <= index_first_hole && index_first_hole <= 15;
         boolean possibleColor = color == Color.R || color == Color.B || color == Color.TR || color == Color.TB;
         if (!possibleNumber || !possibleColor)

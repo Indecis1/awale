@@ -5,8 +5,6 @@ import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.Scanner;
 
-import static java.lang.System.exit;
-
 public class Opponent extends Player {
 
     protected final int turn;
@@ -22,11 +20,10 @@ public class Opponent extends Player {
         String asked_play = askPlay();
         int index_first_hole = setHoleIndex(asked_play);
         Color color = setSeedColor(asked_play);
-        try {
-            legitPlay(board, index_first_hole, color);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            exit(0);
+        while (!legitPlay(board, index_first_hole, color)) {
+            asked_play = askPlay();
+            index_first_hole = setHoleIndex(asked_play);
+            color = setSeedColor(asked_play);
         }
 
         System.out.println("Opponent play is :" + (index_first_hole + 1) + color);
@@ -48,15 +45,21 @@ public class Opponent extends Player {
         return new Scanner(System.in).nextLine();
     }
 
-    void legitPlay(int[][] board, int index_first_hole, Color color) {
+
+    private boolean legitPlay(int[][] board, int index_first_hole, Color color) {
         boolean possibleNumber = 0 <= index_first_hole && index_first_hole <= 15;
         boolean possibleColor = color == Color.R || color == Color.B || color == Color.TR || color == Color.TB;
-        if (!possibleNumber || !possibleColor)
-            throw new IllegalArgumentException("Impossible play from Opponent... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
-        else if (index_first_hole % 2 != turn)
-            throw new IllegalArgumentException("Impossible play from Opponent... Number parity is incorrect.");
-        else if (!arraysOperations.has_seed_of_Color(board, index_first_hole, color))
-            throw new IllegalArgumentException("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + " seeds.");
+        if (!possibleNumber || !possibleColor) {
+            System.out.println("Impossible play from Opponent... Impossible color or Number :" + (index_first_hole + 1) + color + ".");
+            return false;
+        } else if (index_first_hole % 2 != turn) {
+            System.out.println("Impossible play from Opponent... Number parity is incorrect.");
+            return false;
+        } else if (!arraysOperations.has_seed_of_Color(board, index_first_hole, color)) {
+            System.out.println("Impossible play from Opponent... " + (index_first_hole + 1) + " hole has no " + color + " seeds.");
+            return false;
+        }
+        return true;
     }
 
     Color setSeedColor(String asked_play) {
