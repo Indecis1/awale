@@ -22,7 +22,7 @@ public class IA extends Player {
 
     @Override
     public void play(int[][] board) {
-        this.maxDepth = setMaxDepth(board);
+        this.maxDepth = 4;
         int eval_Global = 0;
         boolean isMax = true;
         long time_start = System.nanoTime();
@@ -88,13 +88,11 @@ public class IA extends Player {
             try {
                 threads[i].join(); // Attend la fin de chaque thread
                 scores.add(tasks[i].getEval()); // Supposons que chaque tâche a une méthode pour récupérer le résultat
-                //System.out.println("" + legitMoves.get(i)[0] + Color.to_Color(legitMoves.get(i)[1]) + " score : " + scores.get(i));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        System.out.println();
         int bestScore = scores.get(0);
         arraysOperations.deepCopy(legitMoves.get(0), bestMove);
         for (int i = 1; i < scores.size(); i++) {
@@ -103,7 +101,6 @@ public class IA extends Player {
                 arraysOperations.deepCopy(legitMoves.get(i), bestMove);
             }
         }
-        System.out.println();
 
         return bestScore;
     }

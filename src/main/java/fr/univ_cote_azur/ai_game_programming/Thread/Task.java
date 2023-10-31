@@ -25,14 +25,14 @@ public class Task implements Runnable {
 
     @Override
     public synchronized void run() {
-
-//        Simulate_Player player = new Simulate_Player(turn);
-//        player.simulate_play(board, move);
         boolean isMax = this.isMax;
         int depth = this.depth;
         int turn = this.turn;
         local_evaluation = minMax(board, (turn + 1) % 2, move, local_evaluation, !isMax, depth);
     }
+
+
+
 
     public synchronized int minMax(int[][] parent_board, int turn, int[] parent_move, int parent_eval, boolean isMax, int depth) {
 
