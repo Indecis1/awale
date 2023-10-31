@@ -3,8 +3,6 @@ package fr.univ_cote_azur.ai_game_programming.Thread;
 import fr.univ_cote_azur.ai_game_programming.Player.Simulate_Player;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
-import java.util.ArrayList;
-
 public class Task implements Runnable {
     private final int[][] board;
     private final int turn;
@@ -32,8 +30,6 @@ public class Task implements Runnable {
     }
 
 
-
-
     public synchronized int minMax(int[][] parent_board, int turn, int[] parent_move, int parent_eval, boolean isMax, int depth) {
 
         int[][] local_board = new int[3][16];
@@ -52,10 +48,10 @@ public class Task implements Runnable {
             return local_eval;
         }
 
-        ArrayList<int[]> legitMoves = arraysOperations.setLegitMoves(local_board, turn);
-        if (legitMoves.isEmpty() && isMax) {
+        int[][] legitMoves = arraysOperations.setLegitMoves(local_board, turn);
+        if (legitMoves == null && isMax) {
             return -100;
-        } else if (legitMoves.isEmpty()) {
+        } else if (legitMoves == null) {
             return 100;
         }
 
@@ -68,7 +64,7 @@ public class Task implements Runnable {
 
             int score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
-            if (move == legitMoves.get(0)) {
+            if (move == legitMoves[0]) {
                 bestEval = score;
                 continue;
             }

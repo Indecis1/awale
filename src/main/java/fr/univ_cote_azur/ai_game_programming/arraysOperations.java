@@ -2,8 +2,6 @@ package fr.univ_cote_azur.ai_game_programming;
 
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
-import java.util.ArrayList;
-
 public class arraysOperations {
 
 
@@ -81,30 +79,34 @@ public class arraysOperations {
         return board[line][index];
     }
 
-    public static ArrayList<int[]> setLegitMoves(int[][] board, int index_start) {
-        ArrayList<int[]> legitMoves = new ArrayList<>();
+    public static int[][] setLegitMoves(int[][] board, int index_start) {
+        int[][] legitMoves = new int[32][2]; // Pré-allouer la taille maximale possible
+        int count = 0;
 
         for (int j = index_start; j < 16; j += 2) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i <= 2; i++) {
                 if (board[i][j] > 0) {
-                    legitMoves.add(new int[]{j, i});
+                    legitMoves[count][0] = j;
+                    legitMoves[count][1] = i;
+                    count++;
                     if (i == 2) {
-                        legitMoves.add(new int[]{j, 3});
+                        legitMoves[count][0] = j;
+                        legitMoves[count][1] = 3;
+                        count++;
                     }
                 }
             }
         }
 
-        return legitMoves;
-    }
-
-    public static int has_capturableHoles(int[][] board, int index_start) {
-        int count = 0;
-        //TODO  : verifeir si l'adversaire peut capturer ces trous la (ou bien il a pas de graine par exemple)
-        for (int j = index_start; j < 16; j += 2) {
-            if ((board[0][j] + board[1][j] + board[2][j] == 1 || board[0][j] + board[1][j] + board[2][j] == 2)) count++;
+        if (count == 0) {
+            return null;
         }
-        return count;
+
+        // Réduire la taille du tableau à la taille réelle des mouvements légitimes
+        int[][] result = new int[count][2];
+        System.arraycopy(legitMoves, 0, result, 0, count);
+
+        return result;
     }
 
     public static int count_LegitMoves(int[][] board, int index_start) {

@@ -11,9 +11,11 @@ public abstract class Player {
 
     protected int capturing(int[][] board, int lastIndex) {
         int captured_seeds = 0;
+        int index;
+        int score;
         for (int i = lastIndex; true; i--) {
-            int index = (i + 16) % 16;
-            int score = arraysOperations.count_seeds_at_index(board, index);
+            index = (i + 16) % 16;
+            score = arraysOperations.count_seeds_at_index(board, index);
             if (!(score == 2 || score == 3)) break;
             captured_seeds += score;
             arraysOperations.emptyBoard_at_index(board, index);

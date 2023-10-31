@@ -28,15 +28,17 @@ public class IA extends Player {
         long time_start = System.nanoTime();
         eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
         long time_end = System.nanoTime();
-        if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
-            maxDepth += 2;
-            eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
-            time_end = System.nanoTime();
-        } else if ((time_end - time_start) / Math.pow(10, 9) < 0.09) {
-            maxDepth++;
+
+//         If the move is too quick, modify its depth to make it more powerful.
+        while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
+            System.out.println("depth : " + maxDepth + ", time :" + (time_end - time_start) / Math.pow(10, 9));
+            if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
+                maxDepth += 2;
+            } else maxDepth++;
             eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
             time_end = System.nanoTime();
         }
+
 
         int index_first_hole = bestMove[0];
         Color color = Color.to_Color(bestMove[1]);
@@ -54,37 +56,19 @@ public class IA extends Player {
         }
     }
 
-    private int setMaxDepth(int[][] board) {
-        int count_legitMoves = arraysOperations.count_LegitMoves(board, turn);
-        int count_seeds = arraysOperations.count_seeds(board);
-        if (count_seeds > 60 && count_legitMoves > 25) {
-            return 4;
-        } else if (count_seeds > 50 && count_legitMoves < 20) {
-            return 6;
-        } else if (count_seeds > 25 && count_legitMoves < 20) {
-            return 7;
-        } else if (count_seeds > 15 && count_legitMoves < 20) {
-            return 9;
-        } else if (count_seeds > 10 && count_legitMoves < 15) {
-            return 10;
-        } else if (count_seeds < 10) {
-            return 11;
-        } else return 5;
-    }
-
     private int min_max_parent(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
         ArrayList<Integer> scores = new ArrayList<>();
-        ArrayList<int[]> legitMoves = arraysOperations.setLegitMoves(board, turn);
+        int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
-        Thread[] threads = new Thread[legitMoves.size()];
-        Task[] tasks = new Task[legitMoves.size()];
+        Thread[] threads = new Thread[legitMoves.length];
+        Task[] tasks = new Task[legitMoves.length];
 
-        for (int i = 0; i < legitMoves.size(); i++) {
-            tasks[i] = new Task(board, turn, eval_Parent, isMax, depth, legitMoves.get(i));
+        for (int i = 0; i < legitMoves.length; i++) {
+            tasks[i] = new Task(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
             threads[i] = new Thread(tasks[i]);
             threads[i].start();
         }
-        for (int i = 0; i < legitMoves.size(); i++) {
+        for (int i = 0; i < legitMoves.length; i++) {
             try {
                 threads[i].join(); // Attend la fin de chaque thread
                 scores.add(tasks[i].getEval()); // Supposons que chaque tâche a une méthode pour récupérer le résultat
@@ -94,11 +78,11 @@ public class IA extends Player {
         }
 
         int bestScore = scores.get(0);
-        arraysOperations.deepCopy(legitMoves.get(0), bestMove);
+        arraysOperations.deepCopy(legitMoves[0], bestMove);
         for (int i = 1; i < scores.size(); i++) {
             if (bestScore < scores.get(i)) {
                 bestScore = scores.get(i);
-                arraysOperations.deepCopy(legitMoves.get(i), bestMove);
+                arraysOperations.deepCopy(legitMoves[i], bestMove);
             }
         }
 
