@@ -4,7 +4,11 @@ import fr.univ_cote_azur.ai_game_programming.Color;
 import fr.univ_cote_azur.ai_game_programming.Thread.Task;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
-import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.System.exit;
 
 public class IA extends Player {
 
@@ -34,7 +38,9 @@ public class IA extends Player {
             System.out.println("depth : " + maxDepth + ", time :" + (time_end - time_start) / Math.pow(10, 9));
             if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
                 maxDepth += 2;
-            } else maxDepth++;
+            } else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 4 && score < 8)
+                break;
+            else maxDepth++;
             eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
             time_end = System.nanoTime();
         }
@@ -57,31 +63,36 @@ public class IA extends Player {
     }
 
     private int min_max_parent(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
-        ArrayList<Integer> scores = new ArrayList<>();
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
-        Thread[] threads = new Thread[legitMoves.length];
         Task[] tasks = new Task[legitMoves.length];
 
+
+        ExecutorService executorService = Executors.newFixedThreadPool(legitMoves.length);
         for (int i = 0; i < legitMoves.length; i++) {
             tasks[i] = new Task(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
-            threads[i] = new Thread(tasks[i]);
-            threads[i].start();
-        }
-        for (int i = 0; i < legitMoves.length; i++) {
-            try {
-                threads[i].join(); // Attend la fin de chaque thread
-                scores.add(tasks[i].getEval()); // Supposons que chaque tâche a une méthode pour récupérer le résultat
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            executorService.submit(tasks[i]);
         }
 
-        int bestScore = scores.get(0);
+        executorService.shutdown();
+
+        try {
+            // Attendre la fin de l'exécution de tous les threads ou dépasser un délai maximum
+            boolean terminated = executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+            if (!terminated) {
+                System.out.println("The waiting time has elapsed, not all threads have finished.");
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Interruption occurred while waiting for the threads to finish.");
+            exit(0);
+        }
+
+        int bestScore = tasks[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
-        for (int i = 1; i < scores.size(); i++) {
-            if (bestScore < scores.get(i)) {
-                bestScore = scores.get(i);
+        for (int i = 1; i < tasks.length; i++) {
+            if (bestScore < tasks[i].getEval()) {
+                bestScore = tasks[i].getEval();
                 arraysOperations.deepCopy(legitMoves[i], bestMove);
             }
         }
