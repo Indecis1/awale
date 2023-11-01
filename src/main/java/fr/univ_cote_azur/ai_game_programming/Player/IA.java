@@ -35,11 +35,12 @@ public class IA extends Player {
 
 //         If the move is too quick, modify its depth to make it more powerful.
         while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
-            System.out.println("changing depth...");
-            if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
+            System.out.println("changing depth " + maxDepth + "..." + (time_end - time_start) / Math.pow(10, 9) + "s.");
+            double calcTime = (time_end - time_start) / Math.pow(10, 9);
+            if (calcTime < 0.009) {
                 maxDepth += 2;
-            } else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 4 && score < 8) break;
-            else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 6) break;
+            } else if (calcTime > 0.1 && maxDepth == 4 && score < 8) break;
+            else if (calcTime > 0.2 && maxDepth == 6) break;
             else maxDepth++;
             time_start = System.nanoTime();
             eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);

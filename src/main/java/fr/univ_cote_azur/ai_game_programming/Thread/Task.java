@@ -46,14 +46,11 @@ public class Task implements Runnable {
 
         if (depth - 1 == -1) {
 
+            // A supprimer si on se fait exploser
             if (!isMax) {
-                //TODO : corriger ce code la 
-                int count_capturableHoles = arraysOperations.count_capturableHoles(local_board, turn);
-                int probability_starving = arraysOperations.probability_starving(local_board, turn);
-                local_eval -= (float) ((0.01 * count_capturableHoles) - (0.1 * probability_starving));
-            } else {
-                int probability_starving = arraysOperations.probability_starving(local_board, turn);
-                local_eval += (0.01 * probability_starving);
+                int count_criticHoles = arraysOperations.count_criticHoles(local_board, (turn + 1) % 2);
+                // 1/16 = 0.0625
+                if (count_criticHoles > 0) local_eval -= (float) (0.0620 * count_criticHoles);
             }
             return local_eval;
         }

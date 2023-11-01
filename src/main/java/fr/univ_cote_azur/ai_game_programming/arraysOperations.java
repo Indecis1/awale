@@ -109,31 +109,42 @@ public class arraysOperations {
         return result;
     }
 
-    public static int count_capturableHoles(int[][] board, int index_start) {
+    public static int count_criticHoles(int[][] board, int index_start) {
         int count = 0;
 
         for (int i = index_start; i < 16; i += 2) {
-            if (count_seeds_at_index(board, i) == 1 || count_seeds_at_index(board, i) == 2) count++;
+            int count_seeds_at_index = count_seeds_at_index(board, i);
+            if (count_seeds_at_index == 1 || count_seeds_at_index == 2) count++;
+            if (count_seeds_at_index == 0) count += 2;
         }
         return count;
     }
 
-    public static int probability_starving(int[][] board, int index_start) {
-        int probability = 0;
+    public static int[] computeParam(int[][] board, int index_start) {
+        int count_capturableHoles = 0;
+        int probability_starving = 0;
 
         for (int j = index_start; j < 16; j += 2) {
-                int count = count_seedsColors(board, j);
-                if (count < 2) probability += 1;
-        }
-        return probability;
-    }
+            int countSeeds = count_seeds_at_index(board, j);
 
-    private static int count_seedsColors(int[][] board, int j) {
-        int count = 0;
-        if (has_seed_of_Color(board, j, Color.R)) count++;
-        if (has_seed_of_Color(board, j, Color.B)) count++;
-        if (has_seed_of_Color(board, j, Color.TR)) count++;
-        return count;
+            if (countSeeds == 1 || countSeeds == 2) {
+                ++count_capturableHoles;
+            }
+
+            int count = 0;
+            for (int i = 0; i < 3; i++) {
+                int boardValue = board[i][j];
+                if (boardValue > 0) {
+                    ++count;
+                }
+            }
+
+            if (count < 2) {
+                ++probability_starving;
+            }
+        }
+
+        return new int[]{count_capturableHoles, probability_starving};
     }
 
     public static void deepCopy(int[][] source_board, int[][] new_board) {
