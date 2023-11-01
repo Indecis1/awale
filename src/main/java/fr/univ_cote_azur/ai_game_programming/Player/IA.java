@@ -13,7 +13,7 @@ import static java.lang.System.exit;
 public class IA extends Player {
 
     private final int turn;
-    private final int[] bestMove;
+    protected final int[] bestMove;
     private int score;
     private int maxDepth;
 
@@ -64,7 +64,7 @@ public class IA extends Player {
         }
     }
 
-    private float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
+    protected float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
         assert legitMoves != null;
@@ -130,7 +130,7 @@ public class IA extends Player {
 
     @Override
     public void printScore() {
-        System.out.println("IA score :" + getScore());
+        System.out.println("Advanced IA score :" + getScore());
     }
 
     private void add_to_score(int seedCaptured) {
