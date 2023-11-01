@@ -109,21 +109,30 @@ public class arraysOperations {
         return result;
     }
 
-    public static int count_LegitMoves(int[][] board, int index_start) {
+    public static int count_capturableHoles(int[][] board, int index_start) {
         int count = 0;
 
-        for (int j = index_start; j < 16; j += 2) {
-            if (board[0][j] > 0) {
-                count++;
-            }
-            if (board[1][j] > 0) {
-                count++;
-            }
-            if (board[2][j] > 0) {
-                count += 2;
-            }
+        for (int i = index_start; i < 16; i += 2) {
+            if (count_seeds_at_index(board, i) == 1 || count_seeds_at_index(board, i) == 2) count++;
         }
+        return count;
+    }
 
+    public static int probability_starving(int[][] board, int index_start) {
+        int probability = 0;
+
+        for (int j = index_start; j < 16; j += 2) {
+                int count = count_seedsColors(board, j);
+                if (count < 2) probability += 1;
+        }
+        return probability;
+    }
+
+    private static int count_seedsColors(int[][] board, int j) {
+        int count = 0;
+        if (has_seed_of_Color(board, j, Color.R)) count++;
+        if (has_seed_of_Color(board, j, Color.B)) count++;
+        if (has_seed_of_Color(board, j, Color.TR)) count++;
         return count;
     }
 

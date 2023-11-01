@@ -27,7 +27,7 @@ public class IA extends Player {
     @Override
     public void play(int[][] board) {
         this.maxDepth = 4;
-        int eval_Global = 0;
+        float eval_Global = 0;
         boolean isMax = true;
         long time_start = System.nanoTime();
         eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
@@ -35,12 +35,13 @@ public class IA extends Player {
 
 //         If the move is too quick, modify its depth to make it more powerful.
         while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
-            System.out.println("depth : " + maxDepth + ", time :" + (time_end - time_start) / Math.pow(10, 9));
+            System.out.println("changing depth...");
             if ((time_end - time_start) / Math.pow(10, 9) < 0.009) {
                 maxDepth += 2;
-            } else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 4 && score < 8)
-                break;
+            } else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 4 && score < 8) break;
+            else if ((time_end - time_start) / Math.pow(10, 9) > 0.1 && maxDepth == 6) break;
             else maxDepth++;
+            time_start = System.nanoTime();
             eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
             time_end = System.nanoTime();
         }
@@ -62,9 +63,10 @@ public class IA extends Player {
         }
     }
 
-    private int min_max_parent(int[][] board, int turn, int eval_Parent, boolean isMax, int depth) {
+    private float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
+        assert legitMoves != null;
         Task[] tasks = new Task[legitMoves.length];
 
 
@@ -88,7 +90,7 @@ public class IA extends Player {
             exit(0);
         }
 
-        int bestScore = tasks[0].getEval();
+        float bestScore = tasks[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
         for (int i = 1; i < tasks.length; i++) {
             if (bestScore < tasks[i].getEval()) {

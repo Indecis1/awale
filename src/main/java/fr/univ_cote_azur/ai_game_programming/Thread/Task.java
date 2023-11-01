@@ -9,9 +9,9 @@ public class Task implements Runnable {
     boolean isMax;
     int depth;
     int[] move;
-    private int local_evaluation;
+    private float local_evaluation;
 
-    public Task(int[][] board, int turn, int eval_Parent, boolean isMax, int depth, int[] move) {
+    public Task(int[][] board, int turn, float eval_Parent, boolean isMax, int depth, int[] move) {
         this.board = new int[3][16];
         arraysOperations.deepCopy(board, this.board);
         this.turn = turn;
@@ -30,11 +30,11 @@ public class Task implements Runnable {
     }
 
 
-    public synchronized int minMax(int[][] parent_board, int turn, int[] parent_move, int parent_eval, boolean isMax, int depth) {
+    public synchronized float minMax(int[][] parent_board, int turn, int[] parent_move, float parent_eval, boolean isMax, int depth) {
 
         int[][] local_board = new int[3][16];
         arraysOperations.deepCopy(parent_board, local_board);
-        int local_eval = parent_eval;
+        float local_eval = parent_eval;
         // Simulate the parent play here.
         Simulate_Player player = new Simulate_Player((turn + 1) % 2);
         player.setScore(0);
@@ -45,6 +45,16 @@ public class Task implements Runnable {
         else local_eval += captured_seeds;
 
         if (depth - 1 == -1) {
+
+            if (!isMax) {
+                //TODO : corriger ce code la 
+                int count_capturableHoles = arraysOperations.count_capturableHoles(local_board, turn);
+                int probability_starving = arraysOperations.probability_starving(local_board, turn);
+                local_eval -= (float) ((0.01 * count_capturableHoles) - (0.1 * probability_starving));
+            } else {
+                int probability_starving = arraysOperations.probability_starving(local_board, turn);
+                local_eval += (0.01 * probability_starving);
+            }
             return local_eval;
         }
 
@@ -55,14 +65,14 @@ public class Task implements Runnable {
             return 100;
         }
 
-        int bestEval;
+        float bestEval;
         if (isMax) bestEval = -100;
         else bestEval = 100;
 
 
         for (int[] move : legitMoves) {
 
-            int score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
+            float score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
             if (move == legitMoves[0]) {
                 bestEval = score;
@@ -78,13 +88,13 @@ public class Task implements Runnable {
         return bestEval;
     }
 
-    private synchronized int eval(boolean isMax, int local_parent_eval, int score) {
+    private synchronized float eval(boolean isMax, float local_parent_eval, float score) {
         if (isMax && score > local_parent_eval) return score;
         if (!isMax && score < local_parent_eval) return score;
         return local_parent_eval;
     }
 
-    public int getEval() {
+    public float getEval() {
         return local_evaluation;
     }
 }
