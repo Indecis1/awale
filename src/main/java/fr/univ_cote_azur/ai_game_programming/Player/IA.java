@@ -27,7 +27,7 @@ public class IA extends Player {
     @Override
     public void play(int[][] board) {
         this.maxDepth = 4;
-        float eval_Global = 0;
+        float eval_Global = score;
         boolean isMax = true;
         long time_start = System.nanoTime();
         eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
@@ -80,7 +80,7 @@ public class IA extends Player {
         executorService.shutdown();
 
         try {
-            // Attendre la fin de l'exécution de tous les threads ou dépasser un délai maximum
+            // Attendre la fin de l'exécution de tous les threads
             boolean terminated = executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
             if (!terminated) {

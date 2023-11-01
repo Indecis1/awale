@@ -46,6 +46,11 @@ public class Task implements Runnable {
 
         if (depth - 1 == -1) {
 
+            if(!isMax && local_eval >= 40)
+                return 100;
+            else if(isMax && local_eval <= -40)
+                return -100;
+
             // A supprimer si on se fait exploser
             if (!isMax) {
                 int count_criticHoles = arraysOperations.count_criticHoles(local_board, (turn + 1) % 2);
