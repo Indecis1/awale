@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
 import fr.univ_cote_azur.ai_game_programming.Color;
-import fr.univ_cote_azur.ai_game_programming.Thread.Task;
+import fr.univ_cote_azur.ai_game_programming.Thread.Task2;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.concurrent.ExecutorService;
@@ -10,23 +10,16 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
 
-public class IA extends Player {
+public class IA_eval2 extends IA {
 
-    protected final int turn;
-    protected final int[] bestMove;
-    protected int score;
-    protected int maxDepth;
 
-    public IA(int turn) {
-        this.turn = turn;
-        this.score = 0;
-        this.bestMove = new int[2];
-        this.maxDepth = 0;
+    public IA_eval2(int turn) {
+        super(turn);
     }
 
     @Override
     public void play(int[][] board) {
-        this.maxDepth = 4;
+        this.maxDepth = 7;
         float eval_Global = score;
         boolean isMax = true;
         long time_start = System.nanoTime();
@@ -37,10 +30,11 @@ public class IA extends Player {
         while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
             System.out.println("changing depth " + maxDepth + "..." + (time_end - time_start) / Math.pow(10, 9) + "s.");
             double calcTime = (time_end - time_start) / Math.pow(10, 9);
+            if(maxDepth > 50)
+                break;
             if (calcTime < 0.009) {
                 maxDepth += 2;
-            } else if (calcTime > 0.1 && maxDepth == 4 && score < 8) break;
-            else if (calcTime > 0.2 && maxDepth == 6) break;
+            } else if (maxDepth == 7 && score < 8) break;
             else maxDepth++;
             time_start = System.nanoTime();
             eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
@@ -64,15 +58,18 @@ public class IA extends Player {
         }
     }
 
+    @Override
     protected float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
-        Task[] tasks = new Task[legitMoves.length];
+        assert legitMoves != null;
+        Task2[] Task2s = new Task2[legitMoves.length];
+
 
         ExecutorService executorService = Executors.newFixedThreadPool(legitMoves.length);
         for (int i = 0; i < legitMoves.length; i++) {
-            tasks[i] = new Task(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
-            executorService.submit(tasks[i]);
+            Task2s[i] = new Task2(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
+            executorService.submit(Task2s[i]);
         }
 
         executorService.shutdown();
@@ -89,11 +86,11 @@ public class IA extends Player {
             exit(0);
         }
 
-        float bestScore = tasks[0].getEval();
+        float bestScore = Task2s[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
-        for (int i = 1; i < tasks.length; i++) {
-            if (bestScore < tasks[i].getEval()) {
-                bestScore = tasks[i].getEval();
+        for (int i = 1; i < Task2s.length; i++) {
+            if (bestScore < Task2s[i].getEval()) {
+                bestScore = Task2s[i].getEval();
                 arraysOperations.deepCopy(legitMoves[i], bestMove);
             }
         }
@@ -102,37 +99,7 @@ public class IA extends Player {
     }
 
     @Override
-    public int getScore() {
-        return score;
-    }
-
-    @Override
-    int sowing(int[][] board, int index_first_hole, Color color) {
-        int seeds = arraysOperations.get_seedColor(board, index_first_hole, color);
-        arraysOperations.emptySeedColor_at_index(board, index_first_hole, color);
-        if (color == Color.R || color == Color.TR) return sowingRed(board, index_first_hole, color, seeds);
-        else return sowingBlue(board, index_first_hole, color, seeds);
-    }
-
-    @Override
-    public boolean otherPlayerIsStarving(int[][] board) {
-        int start;
-        if (turn == 0) start = 1;
-        else start = 0;
-        for (int i = start; i < 16; i += 2) {
-            if (arraysOperations.has_seed_of_Color(board, i, Color.R) || arraysOperations.has_seed_of_Color(board, i, Color.B) || arraysOperations.has_seed_of_Color(board, i, Color.TR))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
     public void printScore() {
-        System.out.println("Advanced IA score :" + getScore());
+        System.out.println("IA eval 2 score :" + getScore());
     }
-
-    protected void add_to_score(int seedCaptured) {
-        score += seedCaptured;
-    }
-
 }
