@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming;
 
+import fr.univ_cote_azur.ai_game_programming.Player.IA;
 import fr.univ_cote_azur.ai_game_programming.Player.IA_simpleEval;
-import fr.univ_cote_azur.ai_game_programming.Player.Opponent;
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
 import java.util.Scanner;
@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class Game {
     private final int[][] board;
     private final Player[] playerOrder;
-    private Opponent op;
-    private IA_simpleEval ia;
+    private IA_simpleEval op;
+    private IA ia;
 
 
     public Game() {
@@ -28,16 +28,16 @@ public class Game {
 
     private void whoStart() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Do IA_simpleEval start ? [Y/N]");
+        System.out.print("Do IA start ? [Y/N]");
         if (sc.nextLine().equals("Y")) {
-            ia = new IA_simpleEval(0);
+            ia = new IA(0);
             playerOrder[0] = ia;
-            op = new Opponent(1);
+            op = new IA_simpleEval(1);
             playerOrder[1] = op;
         } else {
-            op = new Opponent(0);
+            op = new IA_simpleEval(0);
             playerOrder[0] = op;
-            ia = new IA_simpleEval(1);
+            ia = new IA(1);
             playerOrder[1] = ia;
         }
     }
@@ -47,7 +47,7 @@ public class Game {
         int turn = 0;
         arraysOperations.print_Board(board);
         while (!endGame) {
-            if (playerOrder[turn] instanceof Opponent) op.play(board);
+            if (playerOrder[turn] instanceof IA_simpleEval) op.play(board);
             else ia.play(board);
             arraysOperations.print_Board(board, playerOrder);
             printEndGamesCondition();
@@ -63,15 +63,15 @@ public class Game {
     }
 
     private void printWinner() {
-        if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() > playerOrder[1].getScore())
-            System.out.println("IA_simpleEval is the winner.");
+        if (playerOrder[0] instanceof IA && playerOrder[0].getScore() > playerOrder[1].getScore())
+            System.out.println("IA is the winner.");
         else if (playerOrder[0].getScore() == playerOrder[1].getScore()) System.out.println("It is a draw.");
-        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() > playerOrder[1].getScore())
-            System.out.println("Opponent is the winner.");
-        else if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() < playerOrder[1].getScore())
-            System.out.println("Opponent is the winner.");
-        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() < playerOrder[1].getScore())
+        else if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() > playerOrder[1].getScore())
             System.out.println("IA_simpleEval is the winner.");
+        else if (playerOrder[0] instanceof IA && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("IA_simpleEval is the winner.");
+        else if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("IA is the winner.");
     }
 
     private boolean playerHasMoreThen40seeds() {

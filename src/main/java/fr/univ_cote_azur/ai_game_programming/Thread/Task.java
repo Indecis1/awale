@@ -44,13 +44,7 @@ public class Task implements Runnable {
         if (isMax) local_eval -= captured_seeds;
         else local_eval += captured_seeds;
 
-        if (depth - 1 == -1) {
-
-            if(!isMax && local_eval >= 40)
-                return 100;
-            else if(isMax && local_eval <= -40)
-                return -100;
-
+        if (depth - 1 == -1 || arraysOperations.count_seeds(local_board) < 10 || Math.abs(local_eval) > 41) {
             // A supprimer si on se fait exploser
             if (!isMax) {
                 int count_criticHoles = arraysOperations.count_criticHoles(local_board, (turn + 1) % 2);
