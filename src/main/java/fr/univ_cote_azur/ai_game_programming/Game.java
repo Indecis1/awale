@@ -1,5 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming;
 
+import fr.univ_cote_azur.ai_game_programming.util.IA2;
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,11 +12,11 @@ public class Game {
      *
      * @param playerNumIa the 0-based player number for IA (0 for the first and 1 for the second)
      */
-    public static void gameLoopIaVsIa(int playerNumIa){
+    public static void gameLoopIaVsBot(int playerNumIa){
         int result;
         int cell;
         Color color;
-        int[] players = {1, 0};
+        int[] nextPlayers = {1, 0};
         int player = 0;
         String input;
         Board board = new Board();
@@ -49,7 +51,7 @@ public class Game {
                 System.out.print(input + " is a forbidden move, Current Player: " + (player+1) + "\n");
             }
             else{
-                player = players[player];
+                player = nextPlayers[player];
             }
             System.out.println(board);
         }while (result < 0);
@@ -58,6 +60,50 @@ public class Game {
         }else{
             System.out.println("It is a draw");
         }
+    }
+
+    public static void gameLoopIaVsIa(int playerNumIa){
+        int result;
+        int cell;
+        Color color;
+        int[] nextPlayers = {1, 0};
+        int player = 0;
+        String input;
+        Board board = new Board();
+        Pattern p = Pattern.compile("^([0-9]{1,2})(R|B|TB|TR)$", Pattern.CASE_INSENSITIVE);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(board);
+        IA ia = new IA(playerNumIa);
+        IA2 ia2 = new IA2(nextPlayers[playerNumIa]);
+        do {
+            System.out.println("Turn: " + board.getTurn());
+            if(player == playerNumIa){
+                IA.Move move = ia.play(board);
+                cell = move.cell();
+                color = move.color();
+                input = (cell+1) + move.color().toString();
+            }else{
+                IA.Move move = ia2.play(board);
+                cell = move.cell();
+                color = move.color();
+                input = (cell+1) + move.color().toString();
+            }
+            System.out.println("Player: "+ player +" IA Move: " + input);
+            result = board.play(cell, player, color);
+            if (result == -2) {
+                System.out.print(input + " is a forbidden move, Current Player: " + (player+1) + "\n");
+            }
+            else{
+                player = nextPlayers[player];
+            }
+            System.out.println(board);
+        }while (result < 0);
+        if (result > 0){
+            System.out.println("the Player " + result + " won the game");
+        }else{
+            System.out.println("It is a draw");
+        }
+        System.out.println("Number of turn: " + board.getTurn());
     }
 
     public static void gameLoopHumanVsHuman(){

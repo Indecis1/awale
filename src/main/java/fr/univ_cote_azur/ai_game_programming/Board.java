@@ -10,8 +10,9 @@ public class Board implements Cloneable {
     private int[] redSeedBoard;
     private int[] blueSeedBoard;
     private int[] transparentSeedBoard;
+    private int turn;
 
-    private List<IA.Move> moveHistory;
+    //private List<IA.Move> moveHistory;
 
     public Board(){
         playerSeeds = new int[2];
@@ -23,7 +24,8 @@ public class Board implements Cloneable {
             blueSeedBoard[i] = 2;
             transparentSeedBoard[i] = 1;
         }
-        moveHistory = new ArrayList<>();
+        turn = 0;
+        //moveHistory = new ArrayList<>();
     }
 
     /**
@@ -74,8 +76,9 @@ public class Board implements Cloneable {
             case TRANSPARENT_RED -> lastHole = playRed(start, transparentSeedBoard);
             case TRANSPARENT_BLUE -> lastHole = playBlue(start, transparentSeedBoard);
         }
-        moveHistory.add(new IA.Move(start, color));
+        //moveHistory.add(new IA.Move(start, color));
         playerSeeds[start % 2] += capture(lastHole);
+        turn++;
         return checkVictory(player);
     }
 
@@ -114,7 +117,7 @@ public class Board implements Cloneable {
         for (i = start + 1; i < start+1+seeds*2; i += 2){
             board[i % 16] += 1;
         }
-        return (i-1) % 16;
+        return (i-2) % 16;
     }
 
     /**
@@ -147,11 +150,11 @@ public class Board implements Cloneable {
     private int checkVictory(int player){
         int[] nextPlayer = {1, 0};
         //TODO when do we have a draw
-        if(playerSeeds[0] >= 50 && playerSeeds[1] >= 50)
+        if(playerSeeds[0] >= 40 && playerSeeds[1] >= 40)
             return 0;
-        if(playerSeeds[0] >= 50)
+        if(playerSeeds[0] >= 40)
             return 1;
-        else if (playerSeeds[1] >= 50)
+        else if (playerSeeds[1] >= 40)
             return 2;
         return detectHungriness(nextPlayer[player]);
     }
@@ -202,22 +205,24 @@ public class Board implements Cloneable {
         this.transparentSeedBoard = transparentSeedBoard;
     }
 
-    public List<IA.Move> getMoveHistory() {
-        return moveHistory;
+    public int getTurn() {
+        return turn;
     }
 
-    public void setMoveHistory(List<IA.Move> moveHistory) {
-        this.moveHistory = moveHistory;
+    public void setTurn(int turn) {
+        this.turn = turn;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("  1   \t  2   \t  3   \t  4   \t  5   \t  6   \t  7   \t  8   \n");
-        for(int i=0; i<16; i++){
+        for(int i=0; i<8; i++){
             sb.append(redSeedBoard[i]).append("R").append(blueSeedBoard[i]).append("B").append(transparentSeedBoard[i]).append("T\t");
-            if (i == 7)
-                sb.append("\n");
+        }
+        sb.append("\n");
+        for(int i=15; i>7; i--){
+            sb.append(redSeedBoard[i]).append("R").append(blueSeedBoard[i]).append("B").append(transparentSeedBoard[i]).append("T\t");
         }
         sb.append("\n").append("  16  \t  15  \t  14  \t  13  \t  12  \t  11  \t  10  \t  9   \n");
         sb.append("Seeds Captured by Player 1: ").append(playerSeeds[0]).append("\n");
@@ -230,11 +235,12 @@ public class Board implements Cloneable {
         try {
             Board board = (Board) super.clone();
             // TODO: copy mutable state here, so the clone can't change the internals of the original
-            board.setPlayerSeeds(playerSeeds);
-            board.setBlueSeedBoard(blueSeedBoard);
-            board.setRedSeedBoard(redSeedBoard);
-            board.setTransparentSeedBoard(transparentSeedBoard);
-            board.setMoveHistory(moveHistory);
+            board.setPlayerSeeds(playerSeeds.clone());
+            board.setBlueSeedBoard(blueSeedBoard.clone());
+            board.setRedSeedBoard(redSeedBoard.clone());
+            board.setTransparentSeedBoard(transparentSeedBoard.clone());
+            board.setTurn(turn);
+            //board.getMoveHistory().addAll(moveHistory);
             return board;
         } catch (CloneNotSupportedException e) {
             return null;
