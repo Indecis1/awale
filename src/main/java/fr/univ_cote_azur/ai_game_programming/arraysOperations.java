@@ -126,7 +126,7 @@ public class arraysOperations {
         for (int i = index_start; i < 16; i += 2) {
             int count_seeds_at_index = count_seeds_at_index(board, i);
             if (count_seeds_at_index < 3) count++;
-            if (count_seeds_at_index == 0) count += 0.5;
+            if (count_seeds_at_index == 0) count += 0.05;
         }
         return count;
     }
