@@ -82,7 +82,7 @@ public class IA {
 
             return result;
         }
-        if (depth == 7){
+        if (depth == 5){
             result = new ArrayList<>();
             result.add(new MinimaxResult(heuristic(board, maxPlayer), cell, color));
             return result;
