@@ -120,31 +120,15 @@ public class arraysOperations {
         return count;
     }
 
-    public static int[] computeParam(int[][] board, int index_start) {
-        int count_capturableHoles = 0;
-        int probability_starving = 0;
+    public static double count_criticHoles2(int[][] board, int index_start) {
+        double count = 0;
 
-        for (int j = index_start; j < 16; j += 2) {
-            int countSeeds = count_seeds_at_index(board, j);
-
-            if (countSeeds == 1 || countSeeds == 2) {
-                ++count_capturableHoles;
-            }
-
-            int count = 0;
-            for (int i = 0; i < 3; i++) {
-                int boardValue = board[i][j];
-                if (boardValue > 0) {
-                    ++count;
-                }
-            }
-
-            if (count < 2) {
-                ++probability_starving;
-            }
+        for (int i = index_start; i < 16; i += 2) {
+            int count_seeds_at_index = count_seeds_at_index(board, i);
+            if (count_seeds_at_index < 3) count++;
+            if (count_seeds_at_index == 0) count += 0.5;
         }
-
-        return new int[]{count_capturableHoles, probability_starving};
+        return count;
     }
 
     public static void deepCopy(int[][] source_board, int[][] new_board) {

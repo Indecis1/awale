@@ -4,16 +4,16 @@ import fr.univ_cote_azur.ai_game_programming.Player.Simulate_Player;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 public class Task_simpleEval extends Task {
-    public Task_simpleEval(int[][] board, int turn, float eval_Parent, boolean isMax, int depth, int[] move) {
+    public Task_simpleEval(int[][] board, int turn, double eval_Parent, boolean isMax, int depth, int[] move) {
         super(board, turn, eval_Parent, isMax, depth, move);
     }
 
     @Override
-    public synchronized float minMax(int[][] parent_board, int turn, int[] parent_move, float parent_eval, boolean isMax, int depth) {
+    public synchronized double minMax(int[][] parent_board, int turn, int[] parent_move, double parent_eval, boolean isMax, int depth) {
 
         int[][] local_board = new int[3][16];
         arraysOperations.deepCopy(parent_board, local_board);
-        float local_eval = parent_eval;
+        double local_eval = parent_eval;
         // Simulate the parent play here.
         Simulate_Player player = new Simulate_Player((turn + 1) % 2);
         player.setScore(0);
@@ -34,14 +34,14 @@ public class Task_simpleEval extends Task {
             return 100;
         }
 
-        float bestEval;
+        double bestEval;
         if (isMax) bestEval = -100;
         else bestEval = 100;
 
 
         for (int[] move : legitMoves) {
 
-            float score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
+            double score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
             if (move == legitMoves[0]) {
                 bestEval = score;

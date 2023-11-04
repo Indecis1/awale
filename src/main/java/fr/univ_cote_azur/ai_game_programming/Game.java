@@ -1,16 +1,14 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-import fr.univ_cote_azur.ai_game_programming.Player.IA_eval2;
-import fr.univ_cote_azur.ai_game_programming.Player.Opponent ;
-import fr.univ_cote_azur.ai_game_programming.Player.Player;
+import fr.univ_cote_azur.ai_game_programming.Player.*;
 
 import java.util.Scanner;
 
 public class Game {
     private final int[][] board;
     private final Player[] playerOrder;
-    private Opponent  op;
-    private IA_eval2 ia;
+    private IA_simpleEval op;
+    private Player ia;
 
 
     public Game() {
@@ -28,14 +26,14 @@ public class Game {
 
     private void whoStart() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Do ia start ? [Y/N]");
+        System.out.print("Do IA_eval2 start ? [Y/N]");
         if (sc.nextLine().equals("Y")) {
             ia = new IA_eval2(0);
             playerOrder[0] = ia;
-            op = new Opponent (1);
+            op = new IA_simpleEval(1);
             playerOrder[1] = op;
         } else {
-            op = new Opponent (0);
+            op = new IA_simpleEval(0);
             playerOrder[0] = op;
             ia = new IA_eval2(1);
             playerOrder[1] = ia;
@@ -47,7 +45,7 @@ public class Game {
         int turn = 0;
         arraysOperations.print_Board(board);
         while (!endGame) {
-            if (playerOrder[turn] instanceof Opponent ) op.play(board);
+            if (playerOrder[turn] instanceof IA_simpleEval) op.play(board);
             else ia.play(board);
             arraysOperations.print_Board(board, playerOrder);
             printEndGamesCondition();
@@ -58,24 +56,26 @@ public class Game {
     }
 
     private void printEndGamesCondition() {
-        System.out.print("One player has more then 40 seeds :" + playerHasMoreThen40seeds() + ". Both player have 40 seeds :" + playersHave40seeds() + ". It remains less then 10 seeds :" + notEnoughSeeds());
+        System.out.print("One player has more then 40 seeds :" + playerHasMoreThen40seeds() +
+                ". Both player have 40 seeds :" + playersHave40seeds() +
+                ". It remains less then 10 seeds :" + notEnoughSeeds());
         System.out.println("\n" + "-".repeat(90));
     }
 
     private void printWinner() {
         if (playerOrder[0] instanceof IA_eval2 && playerOrder[0].getScore() > playerOrder[1].getScore())
-            System.out.println("ia is the winner.");
+            System.out.println("IA_eval2 is the winner.");
         else if (playerOrder[0].getScore() == playerOrder[1].getScore()) System.out.println("It is a draw.");
-        else if (playerOrder[0] instanceof Opponent  && playerOrder[0].getScore() > playerOrder[1].getScore())
-            System.out.println("Opponent  is the winner.");
+        else if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() > playerOrder[1].getScore())
+            System.out.println("IA_simpleEval is the winner.");
         else if (playerOrder[0] instanceof IA_eval2 && playerOrder[0].getScore() < playerOrder[1].getScore())
-            System.out.println("Opponent  is the winner.");
-        else if (playerOrder[0] instanceof Opponent  && playerOrder[0].getScore() < playerOrder[1].getScore())
-            System.out.println("ia is the winner.");
+            System.out.println("IA_simpleEval is the winner.");
+        else if (playerOrder[0] instanceof IA_simpleEval && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("IA_eval2 is the winner.");
     }
 
     private boolean playerHasMoreThen40seeds() {
-        return playerOrder[0].getScore() > 40 || playerOrder[1].getScore() > 40;
+        return playerOrder[0].getScore() > 41 || playerOrder[1].getScore() > 42;
     }
 
     private boolean playersHave40seeds() {

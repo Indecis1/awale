@@ -15,7 +15,7 @@ public class IA_simpleEval extends IA {
     }
 
     @Override
-    protected float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
+    protected double min_max_parent(int[][] board, int turn, double eval_Parent, boolean isMax, int depth) {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
         assert legitMoves != null;
@@ -42,7 +42,7 @@ public class IA_simpleEval extends IA {
             exit(0);
         }
 
-        float bestScore = Task_simpleEvals[0].getEval();
+        double bestScore = Task_simpleEvals[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
         for (int i = 1; i < Task_simpleEvals.length; i++) {
             if (bestScore < Task_simpleEvals[i].getEval()) {

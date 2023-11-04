@@ -27,7 +27,7 @@ public class IA extends Player {
     @Override
     public void play(int[][] board) {
         this.maxDepth = 4;
-        float eval_Global = score;
+        double eval_Global = score;
         boolean isMax = true;
         long time_start = System.nanoTime();
         eval_Global = min_max_parent(board, turn, eval_Global, isMax, maxDepth);
@@ -64,9 +64,10 @@ public class IA extends Player {
         }
     }
 
-    protected float min_max_parent(int[][] board, int turn, float eval_Parent, boolean isMax, int depth) {
+    protected double min_max_parent(int[][] board, int turn, double eval_Parent, boolean isMax, int depth) {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
+        assert legitMoves != null;
         Task[] tasks = new Task[legitMoves.length];
 
         ExecutorService executorService = Executors.newFixedThreadPool(legitMoves.length);
@@ -89,7 +90,7 @@ public class IA extends Player {
             exit(0);
         }
 
-        float bestScore = tasks[0].getEval();
+        double bestScore = tasks[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
         for (int i = 1; i < tasks.length; i++) {
             if (bestScore < tasks[i].getEval()) {

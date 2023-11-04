@@ -52,7 +52,7 @@ public abstract class Player {
 
     public abstract int getScore();
 
-    abstract void play(int[][] board);
+    public abstract void play(int[][] board);
 
     abstract int sowing(int[][] board, int index, Color color);
 
