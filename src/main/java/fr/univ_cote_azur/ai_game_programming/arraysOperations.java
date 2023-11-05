@@ -131,6 +131,17 @@ public class arraysOperations {
         return count;
     }
 
+    public static double count_criticHoles3(int[][] board, int index_start) {
+        double count = 0;
+
+        for (int i = index_start; i < 16; i += 2) {
+            int count_seeds_at_index = count_seeds_at_index(board, i);
+            if (count_seeds_at_index == 2 || count_seeds_at_index == 1) count++;
+            if (count_seeds_at_index == 0) count += 0.05;
+        }
+        return count;
+    }
+
     public static void deepCopy(int[][] source_board, int[][] new_board) {
         for (int i = 0; i < 3; i++) {
             System.arraycopy(source_board[i], 0, new_board[i], 0, 16);

@@ -11,7 +11,11 @@ public class Task3 implements Runnable {
     int[] move;
     private double local_evaluation;
 
-    public Task3(int[][] board, int turn, double eval_Parent, boolean isMax, int depth, int[] move) {
+    private int IA_score;
+
+    private int OP_score;
+
+    public Task3(int[][] board, int turn, double eval_Parent, boolean isMax, int depth, int[] move, int IA_score, int OP_score) {
         this.board = new int[3][16];
         arraysOperations.deepCopy(board, this.board);
         this.turn = turn;
@@ -19,6 +23,8 @@ public class Task3 implements Runnable {
         this.isMax = isMax;
         this.depth = depth;
         this.move = move;
+        this.IA_score = IA_score;
+        this.OP_score = OP_score;
     }
 
     @Override
@@ -30,7 +36,7 @@ public class Task3 implements Runnable {
     }
 
 
-    public synchronized double minMax(int[][] parent_board, int turn, int[] parent_move, double parent_eval, boolean isMax, int depth) {
+    private synchronized double minMax(int[][] parent_board, int turn, int[] parent_move, double parent_eval, boolean isMax, int depth) {
         int[][] local_board = new int[3][16];
         arraysOperations.deepCopy(parent_board, local_board);
         double local_eval = parent_eval;
@@ -39,45 +45,53 @@ public class Task3 implements Runnable {
         player.setScore(0);
         player.simulate_play(local_board, parent_move);
         int captured_seeds = player.getScore();
+
         // Si on est max, le parent etait en min. Donc ce move nous fait perdre des points.
-        if (isMax) local_eval -= captured_seeds;
-        else local_eval += captured_seeds;
-
-
-        // TODO : Trop de temps... Trouver comment optimiser ce code.
-        boolean hasMoreThen_41_seeds = local_eval > 41;
-        int[][] legitMoves = arraysOperations.setLegitMoves(local_board, turn);
-        boolean isStarving = legitMoves == null;
-
-        boolean end_game_One = isStarving || hasMoreThen_41_seeds;
-        boolean end_game_Two = arraysOperations.count_seeds(local_board) < 10;
-        boolean end_minMax = depth - 1 == -1;
-
-        if (end_game_One || end_minMax || end_game_Two) {
-            if (end_game_One) {
-                if (isMax) {
-                    return -100;
-                }
-                return 100;
-            }
-            if (end_minMax) {
-                if (!isMax) {
-                    double count_criticHoles = arraysOperations.count_criticHoles2(local_board, (turn + 1) % 2);
-                    // 1/17 = 0.0625
-                    if (count_criticHoles > 0) local_eval -= (0.0625 * count_criticHoles);
-                }
-                return local_eval;
-            } else {
-                return local_eval;
-            }
+        if (isMax) {
+            local_eval -= captured_seeds;
+            OP_score += captured_seeds;
+        } else {
+            local_eval += captured_seeds;
+            IA_score += captured_seeds;
         }
 
-        double bestEval;
-        if (isMax) bestEval = -100;
-        else bestEval = 100;
+        boolean someoneWon = IA_score > 40 || OP_score > 40;
+        if (someoneWon) {
+            if (IA_score > 40) return 100;
+            return -100;
+        }
+
+        boolean notEnoughSeeds = arraysOperations.count_seeds(local_board) < 10;
+        if (notEnoughSeeds) {
+            if (IA_score >= OP_score) return 100;
+            return -100;
+        }
+
+        if (depth - 1 == -1) {
+//            if (!isMax) {
+//                double count_criticHoles = arraysOperations.count_criticHoles2(local_board, (turn + 1) % 2);
+//                // 1/17 = 0.0625
+//                if (count_criticHoles > 0) local_eval -= (0.0625 * count_criticHoles);
+//            }
+            return local_eval;
+        }
 
 
+        int[][] legitMoves = arraysOperations.setLegitMoves(local_board, turn);
+        if (legitMoves == null) {
+            if (isMax) return -100;
+            return 100;
+        }
+
+
+        double bestEval = 0;
+
+        final int IA_score_save = IA_score;
+        final int OP_score_save = OP_score;
         for (int[] move : legitMoves) {
+
+            IA_score = IA_score_save;
+            OP_score = OP_score_save;
 
             double score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
@@ -102,7 +116,7 @@ public class Task3 implements Runnable {
     }
 
     public double getEval() {
-        if (move[1] == 0) return local_evaluation - 0.01;
+//        if (move[1] == 0) return local_evaluation - 0.01;
         return local_evaluation;
     }
 
