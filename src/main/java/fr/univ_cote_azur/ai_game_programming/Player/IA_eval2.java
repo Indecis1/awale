@@ -29,9 +29,9 @@ public class IA_eval2 extends IA {
         while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
             System.out.println("changing depth " + maxDepth + "..." + (time_end - time_start) / Math.pow(10, 9) + "s.");
             double calcTime = (time_end - time_start) / Math.pow(10, 9);
-            if(maxDepth > 50) break;
+            if (maxDepth > 50) break;
             if (calcTime < 0.009)
-                maxDepth ++;
+                maxDepth++;
             else if (calcTime > 0.1 && maxDepth == 4 && score < 8) break;
             else if (calcTime > 0.1 && maxDepth == 6) break;
             else if (calcTime > 0.08 && maxDepth == 7) break;

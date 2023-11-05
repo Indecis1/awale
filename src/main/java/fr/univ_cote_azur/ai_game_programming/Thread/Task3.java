@@ -91,7 +91,6 @@ public class Task3 implements Runnable {
 
             bestEval = eval(isMax, bestEval, score);
 
-            // TODO : evaluation error...
 
             if ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval)) {
                 break;

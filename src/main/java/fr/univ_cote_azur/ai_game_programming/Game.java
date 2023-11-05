@@ -1,6 +1,8 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-import fr.univ_cote_azur.ai_game_programming.Player.*;
+import fr.univ_cote_azur.ai_game_programming.Player.IA_eval2;
+import fr.univ_cote_azur.ai_game_programming.Player.IA_eval3;
+import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
 import java.util.Scanner;
 
@@ -57,9 +59,7 @@ public class Game {
     }
 
     private void printEndGamesCondition() {
-        System.out.print("One player has more then 40 seeds :" + playerHasMoreThen40seeds() +
-                ". Both player have 40 seeds :" + playersHave40seeds() +
-                ". It remains less then 10 seeds :" + notEnoughSeeds());
+        System.out.print("One player has more then 40 seeds :" + playerHasMoreThen40seeds() + ". Both player have 40 seeds :" + playersHave40seeds() + ". It remains less then 10 seeds :" + notEnoughSeeds());
         System.out.println("\n" + "-".repeat(90));
     }
 
@@ -87,8 +87,5 @@ public class Game {
         return arraysOperations.count_seeds(board) < 10;
     }
 
-    public int get_IA_score(){
-        return playerOrder[0].getScore();
-    }
 
 }

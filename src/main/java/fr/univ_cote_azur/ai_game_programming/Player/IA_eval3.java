@@ -1,7 +1,7 @@
 package fr.univ_cote_azur.ai_game_programming.Player;
 
 import fr.univ_cote_azur.ai_game_programming.Color;
-import fr.univ_cote_azur.ai_game_programming.Thread.Task2;
+import fr.univ_cote_azur.ai_game_programming.Thread.Task3;
 import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.concurrent.ExecutorService;
@@ -29,11 +29,11 @@ public class IA_eval3 extends IA {
         while ((time_end - time_start) / Math.pow(10, 9) < 0.35) {
             System.out.println("changing depth " + maxDepth + "..." + (time_end - time_start) / Math.pow(10, 9) + "s.");
             double calcTime = (time_end - time_start) / Math.pow(10, 9);
-            if(maxDepth > 50) break;
+            if (maxDepth > 20) break;
             if (calcTime < 0.009)
-                maxDepth ++;
+                maxDepth++;
             else if (calcTime > 0.1 && maxDepth == 4 && score < 8) break;
-            else if (calcTime > 0.1 && maxDepth == 6) break;
+            else if (calcTime > 0.09 && maxDepth == 6) break;
             else if (calcTime > 0.08 && maxDepth == 7) break;
             else maxDepth++;
             time_start = System.nanoTime();
@@ -64,13 +64,13 @@ public class IA_eval3 extends IA {
         int[][] legitMoves = arraysOperations.setLegitMoves(board, turn);
 
         assert legitMoves != null;
-        Task2[] Task2s = new Task2[legitMoves.length];
+        Task3[] Task3s = new Task3[legitMoves.length];
 
 
         ExecutorService executorService = Executors.newFixedThreadPool(legitMoves.length);
         for (int i = 0; i < legitMoves.length; i++) {
-            Task2s[i] = new Task2(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
-            executorService.submit(Task2s[i]);
+            Task3s[i] = new Task3(board, turn, eval_Parent, isMax, depth, legitMoves[i]);
+            executorService.submit(Task3s[i]);
         }
 
         executorService.shutdown();
@@ -87,11 +87,11 @@ public class IA_eval3 extends IA {
             exit(0);
         }
 
-        double bestScore = Task2s[0].getEval();
+        double bestScore = Task3s[0].getEval();
         arraysOperations.deepCopy(legitMoves[0], bestMove);
-        for (int i = 1; i < Task2s.length; i++) {
-            if (bestScore < Task2s[i].getEval()) {
-                bestScore = Task2s[i].getEval();
+        for (int i = 1; i < Task3s.length; i++) {
+            if (bestScore < Task3s[i].getEval()) {
+                bestScore = Task3s[i].getEval();
                 arraysOperations.deepCopy(legitMoves[i], bestMove);
             }
         }
