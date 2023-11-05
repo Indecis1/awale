@@ -47,7 +47,7 @@ public class Game {
         arraysOperations.print_Board(board);
         while (!endGame) {
             if (playerOrder[turn] instanceof IA_eval2) op.play(board);
-            else ia.play(board, ia.getScore(), op.getScore());
+            else ia.play(board);
             arraysOperations.print_Board(board, playerOrder);
             printEndGamesCondition();
             endGame = playerHasMoreThen40seeds() || playersHave40seeds() || notEnoughSeeds();

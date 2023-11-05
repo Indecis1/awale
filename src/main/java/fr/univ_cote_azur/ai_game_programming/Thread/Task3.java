@@ -11,11 +11,7 @@ public class Task3 implements Runnable {
     int[] move;
     private double local_evaluation;
 
-    private int IA_score;
-
-    private int OP_score;
-
-    public Task3(int[][] board, int turn, double eval_Parent, boolean isMax, int depth, int[] move, int IA_score, int OP_score) {
+    public Task3(int[][] board, int turn, double eval_Parent, boolean isMax, int depth, int[] move) {
         this.board = new int[3][16];
         arraysOperations.deepCopy(board, this.board);
         this.turn = turn;
@@ -23,8 +19,6 @@ public class Task3 implements Runnable {
         this.isMax = isMax;
         this.depth = depth;
         this.move = move;
-        this.IA_score = IA_score;
-        this.OP_score = OP_score;
     }
 
     @Override
@@ -36,7 +30,7 @@ public class Task3 implements Runnable {
     }
 
 
-    private synchronized double minMax(int[][] parent_board, int turn, int[] parent_move, double parent_eval, boolean isMax, int depth) {
+    public synchronized double minMax(int[][] parent_board, int turn, int[] parent_move, double parent_eval, boolean isMax, int depth) {
         int[][] local_board = new int[3][16];
         arraysOperations.deepCopy(parent_board, local_board);
         double local_eval = parent_eval;
@@ -45,53 +39,48 @@ public class Task3 implements Runnable {
         player.setScore(0);
         player.simulate_play(local_board, parent_move);
         int captured_seeds = player.getScore();
-
         // Si on est max, le parent etait en min. Donc ce move nous fait perdre des points.
-        if (isMax) {
-            local_eval -= captured_seeds;
-            OP_score += captured_seeds;
-        } else {
-            local_eval += captured_seeds;
-            IA_score += captured_seeds;
-        }
-
-        boolean someoneWon = IA_score > 40 || OP_score > 40;
-        if (someoneWon) {
-            if (IA_score > 40) return 100;
-            return -100;
-        }
-
-        boolean notEnoughSeeds = arraysOperations.count_seeds(local_board) < 10;
-        if (notEnoughSeeds) {
-            if (IA_score >= OP_score) return 100;
-            return -100;
-        }
+        if (isMax) local_eval -= captured_seeds;
+        else local_eval += captured_seeds;
 
         if (depth - 1 == -1) {
-//            if (!isMax) {
-//                double count_criticHoles = arraysOperations.count_criticHoles2(local_board, (turn + 1) % 2);
-//                // 1/17 = 0.0625
-//                if (count_criticHoles > 0) local_eval -= (0.0625 * count_criticHoles);
-//            }
+            if (!isMax) {
+                double count_criticHoles = arraysOperations.count_criticHoles2(local_board, (turn + 1) % 2);
+                // 1/17 = 0.0625
+                if (count_criticHoles > 0) local_eval -= (0.0625 * count_criticHoles);
+            }
             return local_eval;
         }
 
+        if (arraysOperations.count_seeds(local_board) < 10) {
+            if (local_eval > 0) return 100;
+            return -100;
+        }
 
-        int[][] legitMoves = arraysOperations.setLegitMoves(local_board, turn);
-        if (legitMoves == null) {
+        if (Math.abs(local_eval) > 40) {
+            if (local_eval > 40) return 100;
+            return -100;
+        }
+
+        if (player.otherPlayerIsStarving(local_board)) {
             if (isMax) return -100;
             return 100;
         }
 
 
-        double bestEval = 0;
+        int[][] legitMoves = arraysOperations.setLegitMoves(local_board, turn);
+        if (legitMoves == null && isMax) {
+            return -100;
+        } else if (legitMoves == null) {
+            return 100;
+        }
 
-        final int IA_score_save = IA_score;
-        final int OP_score_save = OP_score;
+        double bestEval;
+        if (isMax) bestEval = -100;
+        else bestEval = 100;
+
+
         for (int[] move : legitMoves) {
-
-            IA_score = IA_score_save;
-            OP_score = OP_score_save;
 
             double score = minMax(local_board, (turn + 1) % 2, move, local_eval, !isMax, depth - 1);
 
@@ -101,6 +90,8 @@ public class Task3 implements Runnable {
             }
 
             bestEval = eval(isMax, bestEval, score);
+
+            // TODO : evaluation error...
 
             if ((isMax && bestEval > parent_eval) || (!isMax && bestEval < parent_eval)) {
                 break;
@@ -116,7 +107,7 @@ public class Task3 implements Runnable {
     }
 
     public double getEval() {
-//        if (move[1] == 0) return local_evaluation - 0.01;
+        if (move[1] == 0) return local_evaluation - 0.01;
         return local_evaluation;
     }
 
