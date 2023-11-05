@@ -50,9 +50,12 @@ public class Main {
                     input = scanner.nextLine();
                     input = input.strip();
                 }
+                System.out.println("Enter the name of the opponent: \n");
+                String opponent = scanner.nextLine();
+                opponent = opponent.strip();
                 int playNum = Integer.parseInt(input);
                 Game game = new Game("afterLife", "test.mosquitto.org", "1883");
-                game.gameLoopIaVsBotOnNetwork(playNum - 1, "TestOpponent");
+                game.gameLoopIaVsBotOnNetwork(playNum - 1, opponent);
             }
         }catch (Exception e){
             e.printStackTrace();

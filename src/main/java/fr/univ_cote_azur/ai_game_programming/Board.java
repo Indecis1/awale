@@ -10,6 +10,7 @@ public class Board implements Cloneable {
     private int[] redSeedBoard;
     private int[] blueSeedBoard;
     private int[] transparentSeedBoard;
+    private int lastCellPlayed;
     private int turn;
 
     //private List<IA.Move> moveHistory;
@@ -78,6 +79,7 @@ public class Board implements Cloneable {
         }
         //moveHistory.add(new IA.Move(start, color));
         playerSeeds[start % 2] += capture(lastHole);
+        lastCellPlayed = lastHole;
         turn++;
         return checkVictory(player);
     }
@@ -93,12 +95,12 @@ public class Board implements Cloneable {
         int seeds = board[start];
         board[start] = 0;
         int endCell = start+seeds + 1;
-        if (seeds % 16 == 0)
-            endCell += seeds / 16;
         int startIndex = start % 16;
         for (i = start + 1; i < endCell; i++){
-            if ((i % 16) == startIndex)
+            if ((i % 16) == startIndex){
+                endCell++;
                 continue;
+            }
             board[i % 16] += 1;
         }
         return (i-1) % 16;
@@ -150,11 +152,11 @@ public class Board implements Cloneable {
     private int checkVictory(int player){
         int[] nextPlayer = {1, 0};
         //TODO when do we have a draw
-        if(playerSeeds[0] >= 40 && playerSeeds[1] >= 40)
+        if(playerSeeds[0] == 40 && playerSeeds[1] == 40)
             return 0;
-        if(playerSeeds[0] >= 40)
+        if(playerSeeds[0] >= 41)
             return 1;
-        else if (playerSeeds[1] >= 40)
+        else if (playerSeeds[1] >= 41)
             return 2;
         return detectHungriness(nextPlayer[player]);
     }
@@ -205,6 +207,14 @@ public class Board implements Cloneable {
         this.transparentSeedBoard = transparentSeedBoard;
     }
 
+    public int getLastCellPlayed() {
+        return lastCellPlayed;
+    }
+
+    public void setLastCellPlayed(int lastCellPlayed) {
+        this.lastCellPlayed = lastCellPlayed;
+    }
+
     public int getTurn() {
         return turn;
     }
@@ -240,6 +250,7 @@ public class Board implements Cloneable {
             board.setRedSeedBoard(redSeedBoard.clone());
             board.setTransparentSeedBoard(transparentSeedBoard.clone());
             board.setTurn(turn);
+            board.setLastCellPlayed(lastCellPlayed);
             //board.getMoveHistory().addAll(moveHistory);
             return board;
         } catch (CloneNotSupportedException e) {
