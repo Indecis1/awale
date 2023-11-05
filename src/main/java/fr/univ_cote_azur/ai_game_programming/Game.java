@@ -22,6 +22,7 @@ public class Game {
         playerOrder = new Player[2];
         whoStart();
 
+
     }
 
     private void whoStart() {
@@ -75,7 +76,7 @@ public class Game {
     }
 
     private boolean playerHasMoreThen40seeds() {
-        return playerOrder[0].getScore() > 41 || playerOrder[1].getScore() > 41;
+        return playerOrder[0].getScore() > 40 || playerOrder[1].getScore() > 40;
     }
 
     private boolean playersHave40seeds() {
