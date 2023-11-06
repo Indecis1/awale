@@ -1,6 +1,6 @@
 package fr.univ_cote_azur.ai_game_programming;
 
-import fr.univ_cote_azur.ai_game_programming.Player.IA_eval2;
+import fr.univ_cote_azur.ai_game_programming.Player.Opponent;
 import fr.univ_cote_azur.ai_game_programming.Player.IA_eval3;
 import fr.univ_cote_azur.ai_game_programming.Player.Player;
 
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Game {
     private final int[][] board;
     private final Player[] playerOrder;
-    private IA_eval2 op;
+    private Opponent op;
     private IA_eval3 ia;
 
 
@@ -33,10 +33,10 @@ public class Game {
         if (sc.nextLine().equals("Y")) {
             ia = new IA_eval3(0);
             playerOrder[0] = ia;
-            op = new IA_eval2(1);
+            op = new Opponent(1);
             playerOrder[1] = op;
         } else {
-            op = new IA_eval2(0);
+            op = new Opponent(0);
             playerOrder[0] = op;
             ia = new IA_eval3(1);
             playerOrder[1] = ia;
@@ -48,7 +48,7 @@ public class Game {
         int turn = 0;
         arraysOperations.print_Board(board);
         while (!endGame) {
-            if (playerOrder[turn] instanceof IA_eval2) op.play(board);
+            if (playerOrder[turn] instanceof Opponent) op.play(board);
             else ia.play(board);
             arraysOperations.print_Board(board, playerOrder);
             printEndGamesCondition();
@@ -67,11 +67,11 @@ public class Game {
         if (playerOrder[0] instanceof IA_eval3 && playerOrder[0].getScore() > playerOrder[1].getScore())
             System.out.println("IA_eval3 is the winner.");
         else if (playerOrder[0].getScore() == playerOrder[1].getScore()) System.out.println("It is a draw.");
-        else if (playerOrder[0] instanceof IA_eval2 && playerOrder[0].getScore() > playerOrder[1].getScore())
-            System.out.println("IA_eval2 is the winner.");
+        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() > playerOrder[1].getScore())
+            System.out.println("Opponent is the winner.");
         else if (playerOrder[0] instanceof IA_eval3 && playerOrder[0].getScore() < playerOrder[1].getScore())
-            System.out.println("IA_eval2 is the winner.");
-        else if (playerOrder[0] instanceof IA_eval2 && playerOrder[0].getScore() < playerOrder[1].getScore())
+            System.out.println("Opponent is the winner.");
+        else if (playerOrder[0] instanceof Opponent && playerOrder[0].getScore() < playerOrder[1].getScore())
             System.out.println("IA_eval3 is the winner.");
     }
 
