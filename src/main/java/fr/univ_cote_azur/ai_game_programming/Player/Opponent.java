@@ -5,11 +5,19 @@ import fr.univ_cote_azur.ai_game_programming.arraysOperations;
 
 import java.util.Scanner;
 
+/**
+ * The `Opponent` class represents an opponent player controlled by user input.
+ */
 public class Opponent extends Player {
 
     protected final int turn;
     protected int score;
 
+    /**
+     * Constructs a new `Opponent` instance.
+     *
+     * @param turn The turn of the opponent player (0 or 1).
+     */
     public Opponent(int turn) {
         this.turn = turn;
         this.score = 0;
@@ -40,11 +48,15 @@ public class Opponent extends Player {
         }
     }
 
+    /**
+     * Asks the user for the opponent's play input.
+     *
+     * @return The input string representing the opponent's play.
+     */
     String askPlay() {
         System.out.print("Opponent play :");
         return new Scanner(System.in).nextLine();
     }
-
 
     private boolean legitPlay(int[][] board, int index_first_hole, Color color) {
         boolean possibleNumber = 0 <= index_first_hole && index_first_hole <= 15;
@@ -62,6 +74,12 @@ public class Opponent extends Player {
         return true;
     }
 
+    /**
+     * Converts the color string from the input into a `Color` enum value.
+     *
+     * @param asked_play The input string representing the opponent's play.
+     * @return The corresponding `Color` enum value.
+     */
     Color setSeedColor(String asked_play) {
         String seedColor = "";
         for (int i = 0; i < asked_play.length(); i++) {
@@ -77,6 +95,12 @@ public class Opponent extends Player {
         };
     }
 
+    /**
+     * Extracts the hole index from the input string.
+     *
+     * @param asked_play The input string representing the opponent's play.
+     * @return The hole index.
+     */
     int setHoleIndex(String asked_play) {
         int holeNumberId = 0;
         for (int i = 0; i < asked_play.length(); i++) {
@@ -97,7 +121,6 @@ public class Opponent extends Player {
         if (color == Color.R || color == Color.TR) return sowingRed(board, index_first_hole, color, seeds);
         else return sowingBlue(board, index_first_hole, color, seeds);
     }
-
 
     @Override
     public boolean otherPlayerIsStarving(int[][] board) {
@@ -129,3 +152,4 @@ public class Opponent extends Player {
         this.score = score;
     }
 }
+
